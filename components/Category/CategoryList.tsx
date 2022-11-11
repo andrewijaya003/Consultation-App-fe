@@ -1,0 +1,79 @@
+import { FiEdit2 } from '@react-icons/all-files/fi/FiEdit2'
+import { RiDeleteBinLine } from '@react-icons/all-files/ri/RiDeleteBinLine'
+import React, { useState } from 'react'
+import AlertNoData from '../AlertNoData'
+import FAQAddPopup from '../FAQ/FAQAddPopup'
+import FAQList from '../FAQ/FAQList'
+import CategoryDeletePopup from './CategoryDeletePopup'
+import CategoryEditPopup from './CategoryEditPopup'
+
+function CategoryList(props:any) {
+    const moment = require('moment')
+    const [edit, setEdit] = useState(false)
+    const [del, setDel] = useState(false)
+    const [category, setCategory] = useState('')
+    const [add, setAdd] = useState(false)
+
+    function addHandler(){
+        setAdd(true)
+    }
+
+    function editHandler(category:any){
+        setEdit(true)
+        setCategory(category)
+    }
+
+    function deleteHandler(category:any){
+        setDel(true)
+        setCategory(category)
+    }
+
+    return (
+        <>
+            <div className='flex flex-col'>
+                {
+                    props.categories.length === 0 ?
+                    <AlertNoData title='category' />
+                    :
+                    props.categories.map((category:any) => (
+                        <div className='text-secblack flex sm:flex-col w-full lg:flex-row sm:items-center lg:items-start border border-gray-300 rounded-lg px-6 py-5 mb-6 bg-white shadow-xm'>
+                            <div className='flex flex-col w-full'>
+                                <div className='flex sm: w-full justify-between items-center mb-4'>
+                                    <div className='flex flex-col'>
+                                        <div className='text-normal font-bold'>
+                                            { category.description }
+                                        </div>
+                                        <div className='h-0.5 bg-secblack my-1'></div>
+                                    </div>
+                                    <div className='flex justify-end' onClick={addHandler}>
+                                        <input type="submit" value='Add New FAQ' className='bg-blue text-white text-smalltext font-semibold rounded px-4 py-1.5 hover:cursor-pointer' />
+                                    </div>
+                                </div>
+                                <FAQList category={category} faqs={props.faqs.filter((faq:any) => faq.categoryId === category.id)} />
+                                <div className='text-end text-tinytext text-gray-400 mt-4'>
+                                    Updated by { category.updatedBy } on { moment(category.lastUpdate).format('DD MMMM YYYY') }
+                                </div>
+                                <div className="text-end text-smalltext font-bold flex w-full justify-end mt-2">
+                                    <div className='flex py-2 px-4 rounded bg-yellow items-center text-white mr-3 hover:cursor-pointer' onClick={() => editHandler(category)}>
+                                        <FiEdit2 className='text-smalltitle mr-1.5' />
+                                        Edit
+                                    </div>
+                                    <div className='flex py-2 px-4 rounded bg-red items-center text-white hover:cursor-pointer' onClick={() => deleteHandler(category)}>
+                                        <RiDeleteBinLine className='text-smalltitle mr-1.5' />
+                                        Delete
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                }
+            </div>
+            <FAQAddPopup category={category} add={add} onClose={() => setAdd(false)} />
+            <CategoryEditPopup category={category} edit={edit} onClose={() => setEdit(false)} />
+            <CategoryDeletePopup category={category} del={del} onClose={() => setDel(false)} />
+        </>
+    )
+}
+
+
+export default CategoryList

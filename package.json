@@ -1,24 +1,43 @@
 {
-  "name": "fe",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "next": "12.3.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
-  },
-  "devDependencies": {
-    "@types/node": "18.11.2",
-    "@types/react": "18.0.21",
-    "@types/react-dom": "18.0.6",
-    "eslint": "8.25.0",
-    "eslint-config-next": "12.3.1",
-    "typescript": "4.8.4"
-  }
+	"name": "fe",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint"
+	},
+	"dependencies": {
+		"@react-icons/all-files": "^4.1.0",
+		"chart.js": "^3.9.1",
+		"moment": "^2.29.4",
+		"moment-timezone": "^0.5.38",
+		"next": "12.3.1",
+		"nextjs-progressbar": "^0.0.16",
+		"react": "^18.2.0",
+		"react-burger-menu": "^3.0.8",
+		"react-chartjs-2": "^4.3.1",
+		"react-dom": "18.2.0",
+		"react-live-clock": "^6.0.6",
+		"react-loading-skeleton": "^3.1.0",
+		"react-moment": "^1.1.2",
+		"react-page-progress-bar": "^1.0.6",
+		"react-particles-js": "^3.6.0",
+		"react-type-animation": "^2.1.1",
+		"reactjs-popup": "^2.0.5",
+		"verbose": "^0.2.3"
+	},
+	"devDependencies": {
+		"@types/node": "18.11.2",
+		"@types/react": "18.0.21",
+		"@types/react-dom": "18.0.6",
+		"autoprefixer": "^10.4.12",
+		"eslint": "8.25.0",
+		"eslint-config-next": "12.3.1",
+		"postcss": "^8.4.18",
+		"tailwind-scrollbar": "^2.0.1",
+		"tailwindcss": "^3.1.8",
+		"typescript": "4.8.4"
+	}
 }
