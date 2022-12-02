@@ -1,4 +1,6 @@
+import { getCookie } from 'cookies-next'
 import React, { useEffect, useState } from 'react'
+import AlertLoading from '../components/AlertLoading'
 import MeetingAddPopup from '../components/Meeting/MeetingAddPopup'
 import MeetingList from '../components/Meeting/MeetingList'
 
@@ -32,11 +34,13 @@ const DUMMY_MEETINGS = [
     }
 ]
 
-function ManageMeeting(props:any) {
+function ManageMeeting() {
     const [add, setAdd] = useState(false)
-    const [meetings, setMeetings] = useState(props.meetings)
     const [start, setStart] = useState('')
     const [end, setEnd] = useState('')
+    const [meetings, setMeetings] = useState([])
+    const [loading, setLoading] = useState(true)
+
     const compareDates = (d1:any, d2:any) => {
         let date1 = new Date(d1).getTime()
         let date2 = new Date(d2).getTime()
@@ -75,11 +79,26 @@ function ManageMeeting(props:any) {
         console.log(start+' '+end)
     }, [start, end])
 
+    useEffect(() => {
+        setLoading(true)
+        fetch(process.env.BASE_URL+'/meeting', {
+            headers: {
+                'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+            },
+            method: 'GET',
+        }).then(
+            res => res.json()
+        ).then(data => {
+            setMeetings(data)
+            setLoading(false)
+        })
+    }, [])
+
     return (
         <div className='max-w-screen-xl w-full px-4 py-5 flex flex-col ml-auto mr-auto'>
             {/* PageTitle Start */}
             <div className='flex flex-col w-full mb-6 text-secblack'>
-                <div className='flex w-full justify-between items-center'>
+                <div className='flex flex-wrap w-full justify-between items-center'>
                     <div className='flex flex-col'>
                         <div className='text-normaltitle font-bold'>
                             Meetings
@@ -131,18 +150,12 @@ function ManageMeeting(props:any) {
                 </div>
             </div>
             {/* PageTitle End */}
-            <MeetingList meetings={meetings} />
+            {
+                loading ? <AlertLoading title='meetings' /> : <MeetingList meetings={meetings} />
+            }
             <MeetingAddPopup add={add} onClose={() => setAdd(false)} />
         </div>
     )
-}
-
-export async function getServerSideProps(){
-    return {
-        props: {
-            meetings: DUMMY_MEETINGS
-        }
-    }
 }
 
 

@@ -206,7 +206,7 @@ function rating() {
         <div className='max-w-screen-xl w-full px-4 py-5 flex flex-col ml-auto mr-auto'>
             {/* PageTitle Start */}
             <div className='flex flex-col w-full mb-6 text-secblack'>
-                <div className='flex w-full justify-between items-center'>
+                <div className='flex flex-wrap w-full justify-between items-center'>
                     <div className='flex flex-col'>
                         <div className='text-normaltitle font-bold'>
                             Ratings

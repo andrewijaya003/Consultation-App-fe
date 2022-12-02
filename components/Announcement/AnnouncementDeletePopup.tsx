@@ -1,7 +1,36 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { RiDeleteBinLine } from "@react-icons/all-files/ri/RiDeleteBinLine";
+import { getCookie } from 'cookies-next';
+import { useRouter } from 'next/router';
+import { json } from 'stream/consumers';
 
 function AnnouncementDeletePopup(props:any) {
+    const [id, setId] = useState('')
+    const router = useRouter()
+
+    useEffect(() => {
+        if(props.announcement != undefined) {
+            setId(props.announcement.id)
+        }
+    }, [props.announcement])
+
+    async function deleteAnnouncementHandler() {
+        if(id != '') {
+            await fetch(process.env.BASE_URL + '/announcement', {
+                headers : { 
+                    'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN"),
+                    "Content-Type" : "application/json"
+                },
+                method: 'DELETE',
+                body: JSON.stringify({
+                    id: id
+                })
+            }).then(res => res.json()).then(() => router.reload()).catch(() => router.reload())
+        }
+
+        
+    }
+    
     return (
         props.del ?
         <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-popupbg z-20' onClick={props.onClose}>
@@ -20,10 +49,10 @@ function AnnouncementDeletePopup(props:any) {
                 </div>
                 <div className='flex mt-5'>
                     <div className='flex justify-end mr-3' onClick={props.onClose}>
-                        <input type="submit" value='Cancel' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' />
+                        <input type="button" value='Cancel' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' />
                     </div>
-                    <div className='flex justify-end'>
-                        <input type="submit" value='Delete' className='bg-red text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' />
+                    <div className='flex justify-end' onClick={deleteAnnouncementHandler}>
+                        <input type="button" value='Delete' className='bg-red text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' />
                     </div>
                 </div>
             </div>

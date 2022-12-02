@@ -1,4 +1,6 @@
+import { getCookie } from 'cookies-next'
 import React, { useEffect, useState } from 'react'
+import AlertLoading from '../components/AlertLoading'
 import CategoryAddPopup from '../components/Category/CategoryAddPopup'
 import CategoryList from '../components/Category/CategoryList'
 import PageTitle from '../components/PageTitle'
@@ -81,9 +83,9 @@ const DUMMY_FAQS = [
 
 function ManageCategory(props:any) {
     const [add, setAdd] = useState(false)
-    const [categories, setCategories] = useState(props.categories)
-    const [faqs, setFAQS] = useState(props.faqs)
+    const [categories, setCategories] = useState([])
     const [search, setSearch] = useState('')
+    const [loading, setLoading] = useState(true)
 
     function addHandler(){
         setAdd(true)
@@ -94,18 +96,26 @@ function ManageCategory(props:any) {
     }
 
     useEffect(() => {
-        search !== '' ?
-        setCategories(categories.filter((category:any) => category.description.includes(search)))
-        :
-        setCategories(props.categories)
-    }, [search])
+        setLoading(true)
+        fetch(process.env.BASE_URL+'/category', {
+            headers: {
+                'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+            },
+            method: 'GET',
+        }).then(
+            res => res.json()
+        ).then(data => {
+            setCategories(data)
+            setLoading(false)
+        })
+    }, [])
 
     return (
         <>
             <div className='max-w-screen-xl w-full px-4 py-5 flex flex-col ml-auto mr-auto'>
                 {/* PageTitle Start */}
                 <div className='flex flex-col w-full mb-6 text-secblack'>
-                    <div className='flex sm: w-full justify-between items-center'>
+                    <div className='flex flex-wrap sm: w-full justify-between items-center'>
                         <div className='flex flex-col'>
                             <div className='text-normaltitle font-bold'>
                                 Categories
@@ -135,20 +145,13 @@ function ManageCategory(props:any) {
                     </div>
                 </div>
                 {/* PageTitle End */}
-                <CategoryList categories={categories} faqs={faqs} />
+                {
+                    loading ? <AlertLoading title='categories' /> : <CategoryList categories={categories} />
+                }
                 <CategoryAddPopup add={add} onClose={() => setAdd(false)} />
             </div>
         </>
     )
-}
-
-export async function getServerSideProps(){
-    return {
-        props: {
-            categories: DUMMY_CATEGORIES,
-            faqs: DUMMY_FAQS
-        }
-    }
 }
 
 

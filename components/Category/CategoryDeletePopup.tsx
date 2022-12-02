@@ -1,7 +1,35 @@
 import { RiDeleteBinLine } from '@react-icons/all-files/ri/RiDeleteBinLine'
-import React from 'react'
+import { getCookie } from 'cookies-next'
+import { useRouter } from 'next/router'
+import React, { useEffect, useState } from 'react'
 
 function CategoryDeletePopup(props:any) {
+    const [id, setId] = useState('')
+    const router = useRouter()
+
+    useEffect(() => {
+        if(props.category != undefined) {
+            setId(props.category.id)
+        }
+    }, [props.category])
+
+    async function deleteCategoryHandler() {
+        if(id != '') {
+            await fetch(process.env.BASE_URL + '/category', {
+                headers : { 
+                    'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN"),
+                    "Content-Type" : "application/json"
+                },
+                method: 'DELETE',
+                body: JSON.stringify({
+                    id: id
+                })
+            }).then(res => res.json()).then(() => router.reload())
+        }
+
+        
+    }
+
     return (
         props.del ?
         <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-popupbg z-20' onClick={props.onClose}>
@@ -10,7 +38,7 @@ function CategoryDeletePopup(props:any) {
                     <RiDeleteBinLine />
                 </div>
                 <div className='text-smalltitle font-bold my-3 text-center'>
-                    You are about to delete "{props.category.description}" category
+                    You are about to delete "{props.category.category}" category
                 </div>
                 <div className='text-normal mb-0.5 text-center'>
                     This will delete your category
@@ -20,10 +48,10 @@ function CategoryDeletePopup(props:any) {
                 </div>
                 <div className='flex mt-5'>
                     <div className='flex justify-end mr-3' onClick={props.onClose}>
-                        <input type="submit" value='Cancel' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' />
+                        <input type="button" value='Cancel' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' />
                     </div>
                     <div className='flex justify-end'>
-                        <input type="submit" value='Delete' className='bg-red text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' />
+                        <input type="button" value='Delete' className='bg-red text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' onClick={deleteCategoryHandler} />
                     </div>
                 </div>
             </div>

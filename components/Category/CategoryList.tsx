@@ -1,6 +1,6 @@
 import { FiEdit2 } from '@react-icons/all-files/fi/FiEdit2'
 import { RiDeleteBinLine } from '@react-icons/all-files/ri/RiDeleteBinLine'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import AlertNoData from '../AlertNoData'
 import FAQAddPopup from '../FAQ/FAQAddPopup'
 import FAQList from '../FAQ/FAQList'
@@ -14,8 +14,10 @@ function CategoryList(props:any) {
     const [category, setCategory] = useState('')
     const [add, setAdd] = useState(false)
 
-    function addHandler(){
+    function addHandler(category:any){
+        console.log(category)
         setAdd(true)
+        setCategory(category)
     }
 
     function editHandler(category:any){
@@ -41,17 +43,17 @@ function CategoryList(props:any) {
                                 <div className='flex sm: w-full justify-between items-center mb-4'>
                                     <div className='flex flex-col'>
                                         <div className='text-normal font-bold'>
-                                            { category.description }
+                                            { category.category }
                                         </div>
                                         <div className='h-0.5 bg-secblack my-1'></div>
                                     </div>
-                                    <div className='flex justify-end' onClick={addHandler}>
-                                        <input type="submit" value='Add New FAQ' className='bg-blue text-white text-smalltext font-semibold rounded px-4 py-1.5 hover:cursor-pointer' />
+                                    <div className='flex justify-end' onClick={() => addHandler(category)}>
+                                        <input type="button" value='Add New FAQ' className='bg-blue text-white text-smalltext font-semibold rounded px-4 py-1.5 hover:cursor-pointer' />
                                     </div>
                                 </div>
-                                <FAQList category={category} faqs={props.faqs.filter((faq:any) => faq.categoryId === category.id)} />
+                                <FAQList categoryId={category.id} />
                                 <div className='text-end text-tinytext text-gray-400 mt-4'>
-                                    Updated by { category.updatedBy } on { moment(category.lastUpdate).format('DD MMMM YYYY') }
+                                    Updated by { category.updatedByStaff != null ? category.updatedByStaff.name : 'Admin' } on { moment(category.lastUpdatedTime).format('DD MMMM YYYY') }
                                 </div>
                                 <div className="text-end text-smalltext font-bold flex w-full justify-end mt-2">
                                     <div className='flex py-2 px-4 rounded bg-yellow items-center text-white mr-3 hover:cursor-pointer' onClick={() => editHandler(category)}>

@@ -1,36 +1,70 @@
+import axios, { AxiosResponse } from 'axios'
+import { setCookie, getCookie } from 'cookies-next'
+import { Cookies } from 'next/dist/server/web/spec-extension/cookies'
 import { useRouter } from 'next/router'
+import { NextResponse } from 'next/server'
 import React, { useState } from 'react'
 import Skeleton from 'react-loading-skeleton'
+import ReactLoading from 'react-loading';
+import AlertError from './AlertError'
+import { MdCancel } from '@react-icons/all-files/md/MdCancel'
 
 function LoginForm() {
-    const [actor, setActor] = useState('Student')
     const router = useRouter()
+    const [actor, setActor] = useState('STUDENT')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [errorMsg, setErrorMsg] = useState('')
 
     function actorHandler(value:any) {
         setActor(value)
     }
 
-    async function loginHandler(){
-        console.log(process.env.BASE_URL+'/auth/login')
-        console.log(email+' '+password)
-        const response:Response = await fetch(process.env.BASE_URL+'/auth/login', {
-            method: 'POST',
-            headers: {
-                "Content-Type": "appliacation/json" 
-            },
-            body: JSON.stringify({
+    async function loginHandler() {
+        if(email === '') {
+            setErrorMsg('Email must be filled')
+        } else if(password === '') {
+            setErrorMsg('Password must be filled')
+        } else {
+            setLoading(true)
+            const user = {
                 "email": email,
                 "password": password,
                 "role": actor
+            }
+    
+            const response:any = await fetch(process.env.BASE_URL+'/auth/login', {
+                headers : { 
+                    "Content-Type" : "application/json"
+                },
+                method: 'POST',
+                body: JSON.stringify(user)
+            }).then(
+                res => res.json()
+            ).then((data) => {
+                setLoading(false)
+                return data
+            }).catch(err => {
+                console.log(err)
             })
-        })
+            
+            setLoading(false)
+            console.log(response)
+    
+            if(response != undefined) {
+                const data:any = await response
+        
+                setCookie('ACCESS_TOKEN', data.access_token, {maxAge: 7200})
+                setCookie('REFRESH_TOKEN', data.refresh_token, {maxAge: 7200})
+                
+                
+                await router.push('/home')
+            } else {
+                setErrorMsg('Wrong credential')
+            }
+        }
 
-        // const json = await response.json()
-        // console.log(json)
-        // return json
-        // router.push('/home')
     }
 
     return (
@@ -50,21 +84,21 @@ function LoginForm() {
 				/>
 			</div>
 			<div className="flex w-full justify-evenly items-center h-12 border-b border-gray-300 mb-7">
-				<div onClick={() => actorHandler('Student')} className="w-max h-max text-center text-smalltext text-gray-400 font-bold duration-200 hover:text-blue hover:cursor-pointer">
+				<div onClick={() => actorHandler('STUDENT')} className="w-max h-max text-center text-smalltext text-gray-400 font-bold duration-200 hover:text-blue hover:cursor-pointer">
 					Student
 				</div>
-				<div onClick={() => actorHandler('Admin')} className="w-max h-max text-center text-smalltext text-gray-400 font-bold duration-200 hover:text-blue hover:cursor-pointer">
-					Admin
+				<div onClick={() => actorHandler('STAFF')} className="w-max h-max text-center text-smalltext text-gray-400 font-bold duration-200 hover:text-blue hover:cursor-pointer">
+					Staff
 				</div>
-				<div onClick={() => actorHandler('Faaculty Supervisor')} className="w-max h-max text-center text-smalltext text-gray-400 font-bold duration-200 hover:text-blue hover:cursor-pointer">
+				<div onClick={() => actorHandler('FACULTY SUPERVISOR')} className="w-max h-max text-center text-smalltext text-gray-400 font-bold duration-200 hover:text-blue hover:cursor-pointer">
 					Faculty Supervisor
 				</div>
-				<div onClick={() => actorHandler('Site Supervisor')} className="w-max h-max text-center text-smalltext text-gray-400 font-bold duration-200 hover:text-blue hover:cursor-pointer">
+				<div onClick={() => actorHandler('SITE SUPERVISOR')} className="w-max h-max text-center text-smalltext text-gray-400 font-bold duration-200 hover:text-blue hover:cursor-pointer">
 					Site Supervisor
 				</div>
 			</div>
-			<div className="text-smalltitle text-blue font-bold mb-7">
-				Login {actor} Enrichment
+			<div className="text-normal text-blue font-bold mb-7">
+				LOGIN {actor} ENRICHMENT
 			</div>
 			<div className="w-345 pb-3.5">
 				<div className="relative">
@@ -83,7 +117,7 @@ function LoginForm() {
                     </label>
 				</div>
 			</div>
-			<div className="w-345 pb-5">
+			<div className="w-345 pb-3.5">
 				<div className="relative">
                     <input
                         type="password"
@@ -100,7 +134,28 @@ function LoginForm() {
                     </label>
 				</div>
 			</div>
-			<input type='button' value='Log In' className="w-345 mb-10 py-3 rounded-md bg-blue text-center text-white font-bold hover:cursor-pointer hover:bg-hoverblue duration-200" onClick={loginHandler} />
+            {
+                errorMsg !== '' ? 
+                <div className='flex w-345 rounded-lg px-2 py-2 mb-3.5 bg-white shadow-xm bg-pink'>
+                    <div className='text-red mr-3 text-normaltitle hover:cursor-pointer' onClick={() => setErrorMsg('')}>
+                        <MdCancel />
+                    </div>
+                    <div className='flex flex-col w-full'>
+                        <div className='text-redblack text-smalltext font-bold'>
+                            Alert
+                        </div>
+                        <div className='text-tinytext text-red'>
+                            {errorMsg}.
+                        </div>
+                    </div>
+                </div> : <></>
+            }
+            <div className='flex justify-center w-345 mb-10 py-3 rounded-md bg-blue text-center text-white font-bold hover:cursor-pointer hover:bg-hoverblue duration-200' onClick={loginHandler}>
+                {
+                    loading ? <ReactLoading type={'spin'} color={'#ffffff'} width={20} height={0} /> : <></>
+                }
+			    <input className='ml-2' type='button' value='Log In' />
+            </div>
 		</form>
     )
 }

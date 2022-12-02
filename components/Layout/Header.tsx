@@ -1,9 +1,12 @@
+import axios from 'axios';
+import { getCookie } from 'cookies-next';
 import React, { useEffect, useState } from 'react'
 import { TypeAnimation } from 'react-type-animation';
 
 function Header() {
     const [date, setDate] = useState<Date>()
     const moment = require('moment')
+    const [user, setUser] = useState({})
 
     useEffect(() => {
         setDate(moment(new Date()))
@@ -13,6 +16,14 @@ function Header() {
         }, 1000)
 
         return () => clearInterval(interval)
+    }, [])
+
+    useEffect(() => {
+        axios.get(process.env.BASE_URL+'/staff/me', {
+            headers: {
+                'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN") 
+            }
+        }).then((res) => setUser(res.data))
     }, [])
 
     return (
@@ -29,7 +40,7 @@ function Header() {
                 />
             </div>
             <div className='flex flex-col items-end'>
-                <div className='sm:flex-col flex'>
+                <div className='flex-col flex'>
                     <div className='text-end text-smalltext font-bold text-secblack'>
                         <TypeAnimation
                             sequence={[
@@ -61,7 +72,7 @@ function Header() {
                         />
                     </div>
                     <div className='text-end sm:text-normal lg:text-smalltitle font-bold text-blue ml-1.5'>
-                        Andre Setiawan Wijaya
+                        { user.name }
                     </div>
                 </div>
                 <div className='flex justify-end'>
@@ -74,12 +85,11 @@ function Header() {
     )
 }
 
-export async function getStaticProps(){
+export async function getServerSideProps(){
     return {
         props: {
             date: new Date()
-        },
-        revalidate: 1
+        }
     }
 }
 

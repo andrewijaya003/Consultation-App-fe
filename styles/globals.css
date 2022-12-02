@@ -28,6 +28,7 @@ a {
 
 ::-webkit-scrollbar {
 	width: 8.5px;
+	height: 8.5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -44,6 +45,7 @@ a {
 	background-size: 400%;
 
     background-image: linear-gradient(to right, var(--tw-gradient-stops));
+	/* -45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab */
 
 	--tw-gradient-from: #00a9e2;
 	--tw-gradient-to: rgb(14 165 233 / 0);
@@ -53,7 +55,7 @@ a {
 	--tw-gradient-stops: var(--tw-gradient-from), #0ea5e9, var(--tw-gradient-to);
 
 	--tw-gradient-to: #22d3ee;
-	animation: AnimationName 3s ease infinite;
+	animation: AnimationName 5s ease infinite;
 }
 
 @keyframes AnimationName {
