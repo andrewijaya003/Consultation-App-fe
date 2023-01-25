@@ -104,7 +104,7 @@ function contact() {
     }, [roomChat])
 
     useEffect(() => {
-        console.log(roomChatData)
+        // console.log(roomChatData)
     }, [roomChatData])
 
     const refetchRoomChat = async () => {

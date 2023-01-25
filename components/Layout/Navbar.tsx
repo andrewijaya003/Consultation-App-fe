@@ -14,11 +14,11 @@ function Navbar() {
     const [user, setUser] = useState()
     const [role, setRole] = useState('')
     const { instance } = useMsal();
-    const socket = io('http://localhost:8000', { transports: ['websocket', 'polling', 'flashsocket'] })
+    // const socket = io('http://localhost:8000')
 
-    socket.on('connect', () => {
-        console.log(socket.id)
-    })
+    // socket.on('connect', () => {
+    //     console.log(socket.id)
+    // })
 
     useEffect(() => {
         if(getCookie('ROLE') == 'STAFF') {
@@ -39,7 +39,7 @@ function Navbar() {
     }, [])
 
     useEffect(() => {
-        socket.emit('user-online', {id: user?.id})
+        // socket.emit('user-online', {id: user?.id})
     }, [user])
 
     function hamburgerHandler(){

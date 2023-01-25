@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { ImAttachment } from "@react-icons/all-files/im/ImAttachment";
 import {IoIosArrowBack, IoIosArrowDown, IoIosArrowUp} from "react-icons/io";
 import FilePopup from './FilePopup';
@@ -10,6 +10,7 @@ import StaffMessage from './StaffMessage';
 import {io} from 'socket.io-client'
 import ResolveChat from './ResolveChat';
 import InfiniteScroll from 'react-infinite-scroll-component'
+import { Socket } from 'socket.io';
 
 const fetcher = (endpoint: RequestInfo | URL) =>fetch(endpoint, {
         headers: {
@@ -27,17 +28,31 @@ function UserChat(props:any) {
     const [roomChatId, setRoomChatId] = useState('')
     const [endpointRooms, setEndpointRooms] = useState(process.env.BASE_URL+'/room-chat/room-chats-by-user/'+props.userId)
     const {data: rooms, mutate: mutateRooms} = useSWR(endpointRooms, fetcher)
-    const socket = io('http://localhost:8000', { transports: ['websocket', 'polling', 'flashsocket'] })
+    
     const [resolve, setResolve] = useState(false)
     const [searchChat, setSearchChat] = useState('')
     const [bounceSearchChat] = useDebounce(searchChat, 1000)
     const [searchChatData, setSearchChatData] = useState([])
     const [indexChat, setIndexChat] = useState(0)
+    const socket = useMemo<any>(()=>{
+        if (!window) return
 
-    socket.on('receive-message', ((roomId, message) => (
-        console.log(roomId+' '+message)
-        // mutateRooms()
-    )))
+        const socket = io('http://localhost:8000')
+        socket.on('receive-message', (data => (
+            console.log(data)
+            // mutateRooms()
+        )))
+        console.log("test")
+
+        return socket
+    }, [window]) 
+
+    useEffect(()=>{
+        return () => {
+            socket.disconnect()
+        }
+    }, []);
+    
 
     useEffect(() => {
         console.log(props.focusIdComponent)
@@ -83,7 +98,7 @@ function UserChat(props:any) {
                 body: sendChat
             }).then((res) => res.json())
 
-            socket.emit('message', roomChatId, data)
+            socket.emit('message', {roomId: roomChatId, data: data})
             // mutateRooms()
 
             setMessage('')

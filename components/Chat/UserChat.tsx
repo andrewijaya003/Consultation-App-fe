@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { ImAttachment } from "@react-icons/all-files/im/ImAttachment";
 import { RiEmotionHappyLine } from "@react-icons/all-files/ri/RiEmotionHappyLine";
 import { RiMoreFill } from "@react-icons/all-files/ri/RiMoreFill";
@@ -41,12 +41,24 @@ function UserChat(props:any) {
     const [bounceSearchChat] = useDebounce(searchChat, 1000)
     const [searchChatData, setSearchChatData] = useState([])
     const [indexChat, setIndexChat] = useState(0)
-    const socket = io('http://localhost:8000', { transports: ['websocket', 'polling', 'flashsocket'] })
+    const socket = useMemo<any>(()=>{
+        if (!window) return;
 
-    socket.on('receive-message', ((id, message) => (
-        console.log(id+' '+message)
-        // mutateActiveRoom([...activeRoom, ...message])
-    )))
+        const socket = io('http://localhost:8000');
+        socket.on('receive-message', (data => (
+            console.log(data)
+            // mutateRooms()
+        )))
+        console.log("test");
+
+        return socket;
+    }, [window])
+
+    useEffect(()=>{
+        return () => {
+            socket.disconnect()
+        }
+    }, []);
 
     useEffect(() => {
         if(files.length != 0 ) {
@@ -88,7 +100,7 @@ function UserChat(props:any) {
                 body: sendChat
             }).then((res) => res.json())
             
-            socket.emit('message', socket.id, {roomId: props.roomChatId, data: data})
+            socket.emit('message', {roomId: props.roomChatId, data: data})
             // mutateChats()
 
             setMessage('')
@@ -98,7 +110,7 @@ function UserChat(props:any) {
     }
 
     useEffect(() => {
-        console.log(activeRoom)
+        // console.log(activeRoom)
     }, [activeRoom])
 
     const refetch = async () => {
