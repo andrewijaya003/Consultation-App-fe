@@ -1,28 +1,61 @@
+import { FiEdit2 } from '@react-icons/all-files/fi/FiEdit2'
+import { RiDeleteBinLine } from '@react-icons/all-files/ri/RiDeleteBinLine'
 import { getCookie } from 'cookies-next'
 import React, { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import AlertLoading from '../components/AlertLoading'
-import MeetingAddPopup from '../components/Meeting/MeetingAddPopup'
-import MeetingList from '../components/Meeting/MeetingList'
+import AlertNoData from '../components/AlertNoData'
 
-const fetcher = (endpoint: RequestInfo | URL) =>fetch(endpoint, {
-        headers: {
-            'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
-        },
-        method: 'GET',
-    }).then(res => res.json())
+// const fetcher = (endpoint: RequestInfo | URL) =>fetch(endpoint, {
+//         headers: {
+//             'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+//         },
+//         method: 'GET',
+//     }).then(res => res.json())
 
-function ManageMeeting() {
+function meeting() {
+    const moment = require('moment')
     const [add, setAdd] = useState(false)
     const [start, setStart] = useState('')
     const [end, setEnd] = useState('')
-    const [endpoint, setEndpoint] = useState(process.env.BASE_URL+'/meeting')
-    const {data, mutate} = useSWR(endpoint, fetcher)
+    const [user, setUser] = useState('')
+    const [loading, setLoading] = useState(true)
+    const [meetings, setMeetings] = useState()
 
-    const refetch = async () => {
-        await mutate()
-        setAdd(false)
-    }
+    useEffect(() => {
+        setLoading(true)
+        fetch(process.env.BASE_URL+`/${getCookie('ROLE') === 'STAFF' ? 'staff' : 'user'}/me`, {
+            headers : { 
+                'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN"),
+                "Content-Type" : "application/json"
+            },
+            method: 'GET'
+        }).then(
+            res => res.json()
+        ).then((data) => {
+            setUser(data)
+        })
+    }, [])
+
+    useEffect(() => {
+        if(user != '' && user != undefined) {
+            fetch(process.env.BASE_URL+'/meeting/user', {
+                headers: {
+                    'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+                    'Content-type': 'application/json'
+                },
+                method: 'POST',
+                body: JSON.stringify({
+                    userId: user.id
+                })
+            }).then(res => res.json()).then(data => setMeetings(data))
+        }
+        setLoading(false)
+    }, [user])
+    
+    useEffect(() => {
+        console.log(meetings)
+    }, [meetings])
 
     const compareDates = (d1:any, d2:any) => {
         let date1 = new Date(d1).getTime()
@@ -53,44 +86,16 @@ function ManageMeeting() {
         setStart('')
         setEnd('')
         if(start !== '' && end !== '') {
-            if(getCookie('ROLE') === 'STAFF') {
-                fetch(process.env.BASE_URL+'/meeting', {
-                    headers: {
-                        'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
-                    },
-                    method: 'GET',
-                }).then(
-                    res => res.json()
-                ).then(data => {
-                    mutate(data, false)
+            fetch(process.env.BASE_URL+'/meeting/user', {
+                headers: {
+                    'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+                    'Content-type': 'application/json'
+                },
+                method: 'POST',
+                body: JSON.stringify({
+                    userId: user.id
                 })
-            } else {
-                fetch(process.env.BASE_URL+`/${getCookie('ROLE') === 'STAFF' ? 'staff' : 'user'}/me`, {
-                    headers : { 
-                        'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN"),
-                        "Content-Type" : "application/json"
-                    },
-                    method: 'GET'
-                }).then(
-                    res => res.json()
-                ).then((data) => {
-                    // setUser(data)
-                    fetch(process.env.BASE_URL+'/meeting/user', {
-                        headers: {
-                            'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
-                            "Content-Type" : "application/json"
-                        },
-                        method: 'POST',
-                        body: JSON.stringify({
-                            userId: data.id
-                        })
-                    }).then(
-                        res => res.json()
-                    ).then(data => {
-                        mutate(data, false)
-                    })
-                }).catch(err => console.log(err))
-            }
+            }).then(res => res.json()).then(data => setMeetings(data))
         }
     }
 
@@ -112,56 +117,14 @@ function ManageMeeting() {
                 }).then(
                     res => res.json()
                 ).then(data => {
-                    mutate(data, false)
+                    setMeetings(data)
                 })
             }
         }
     }, [start, end])
-
-    useEffect(() => {
-        if(getCookie('ROLE') === 'STAFF') {
-            fetch(process.env.BASE_URL+'/meeting', {
-                headers: {
-                    'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
-                },
-                method: 'GET',
-            }).then(
-                res => res.json()
-            ).then(data => {
-                mutate(data, false)
-            })
-        } else {
-            fetch(process.env.BASE_URL+`/${getCookie('ROLE') === 'STAFF' ? 'staff' : 'user'}/me`, {
-                headers : { 
-                    'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN"),
-                    "Content-Type" : "application/json"
-                },
-                method: 'GET'
-            }).then(
-                res => res.json()
-            ).then((data) => {
-                // setUser(data)
-                fetch(process.env.BASE_URL+'/meeting/user', {
-                    headers: {
-                        'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
-                        "Content-Type" : "application/json"
-                    },
-                    method: 'POST',
-                    body: JSON.stringify({
-                        userId: data.id
-                    })
-                }).then(
-                    res => res.json()
-                ).then(data => {
-                    mutate(data, false)
-                })
-            }).catch(err => console.log(err))
-        }
-    }, [])
-
+    
     return (
         <div className='max-w-screen-xl w-full px-4 py-5 flex flex-col ml-auto mr-auto'>
-            {/* PageTitle Start */}
             <div className='flex flex-col w-full mb-6 text-secblack'>
                 <div className='flex flex-wrap w-full justify-between items-center'>
                     <div className='flex flex-col'>
@@ -219,14 +182,47 @@ function ManageMeeting() {
             </div>
             {/* PageTitle End */}
             {
-                !data ? <AlertLoading title='meetings' /> : <MeetingList meetings={data} endpoint={endpoint} />
-            }
-            {
-                getCookie('ROLE') === 'STAFF' ? <MeetingAddPopup add={add} onClose={() => setAdd(false)} refetch={refetch} /> : <></>
+                loading ? 
+                <AlertLoading title='meetings' /> 
+                :
+                    meetings?.length == 0 ? 
+                    <AlertNoData title='meeting' />
+                    :
+                    meetings?.map((meeting:any) => (
+                        <div className={`text-secblack flex sm:flex-col w-full lg:flex-row sm:items-center lg:items-start bg-white border border-gray-300 rounded-lg px-6 py-5 mb-6 shadow-xm `}>
+                            <div className='flex flex-col w-full'>
+                                <div className='flex justify-between w-full'>
+                                    <div className='text-start mb-2 text-[19px] font-bold whitespace-pre-wrap break-word'>
+                                        Detail Meeting
+                                    </div>
+                                    <div className={`${meeting.status === 'Done' ? 'bg-[#83d475]' : meeting.status === 'Pending' ? 'bg-yellow' : 'bg-red'}  items-center text-tinytext font-bold rounded text-white flex justify-center items-center p-2`}>
+                                        {meeting.status}
+                                    </div>
+                                </div>
+                                <div className='text-smalltext font-bold'>
+                                    Time:
+                                </div>
+                                <div className='text-justify text-smalltext whitespace-pre-wrap break-word mb-2'>
+                                    { moment(meeting.startTime).format('DD MMMM YYYY') } || { moment(meeting.startTime).format('hh:mm A') }
+                                </div>
+                                <div className='text-smalltext font-bold'>
+                                    Location:
+                                </div>
+                                <div className='text-justify text-smalltext whitespace-pre-wrap break-word mb-8'>
+                                    {meeting.location}
+                                </div>
+                                <div className='text-smalltext font-bold'>
+                                    Notes for student:
+                                </div>
+                                <div className='text-justify text-smalltext whitespace-pre-wrap break-word mb-2'>
+                                    { meeting.description }
+                                </div>
+                            </div>
+                        </div>
+                    ))
             }
         </div>
     )
 }
 
-
-export default ManageMeeting
+export default meeting

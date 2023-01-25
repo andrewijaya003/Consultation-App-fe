@@ -5,13 +5,10 @@ import React, { useEffect, useState } from 'react'
 
 function CategoryDeletePopup(props:any) {
     const [id, setId] = useState('')
-    const router = useRouter()
 
     useEffect(() => {
-        if(props.category != undefined) {
-            setId(props.category.id)
-        }
-    }, [props.category])
+        setId(props.category.id)
+    }, [props.del])
 
     async function deleteCategoryHandler() {
         if(id != '') {
@@ -24,10 +21,8 @@ function CategoryDeletePopup(props:any) {
                 body: JSON.stringify({
                     id: id
                 })
-            }).then(res => res.json()).then(() => router.reload())
+            }).then(res => res.json()).then(props.refetch)
         }
-
-        
     }
 
     return (

@@ -34,6 +34,7 @@ module.exports = {
 				smalltext: "14px",
 				tinytext: "12.8px",
 				normaltitle: "22px",
+				xtinytext: "11px",
 			},
 			colors: {
 				white: "#ffffff",

@@ -1,6 +1,7 @@
 import { getCookie } from 'cookies-next'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
+import { MultiSelect } from 'react-multi-select-component'
 import AlertError from '../AlertError'
 import LabelInput from '../LabelInput'
 import PageTitle2 from '../PageTitle2'
@@ -10,7 +11,12 @@ function FAQEditPopup(props:any) {
     const [problem, setProblem] = useState('')
     const [solution, setSolution] = useState('')
     const [errorMsg, setErrorMsg] = useState('')
-    const router = useRouter()
+    const [option, setOption] = useState([
+        {label:'FS',value:'FS'},
+        {label:'SS',value:'SS'},
+        {label:'STUDENT',value:'STUDENT'}
+    ])
+    const [roles, setRoles] = useState([])
 
     useEffect(() => {
         if(props.faq !== undefined) {
@@ -25,9 +31,16 @@ function FAQEditPopup(props:any) {
             setErrorMsg('Problem must be filled')
         } else if(solution === '') {
             setErrorMsg('Solution must be filled')
+        } else if(roles.length == 0) {
+            setErrorMsg('Role must be choosen')
         }
 
-        if(problem !== '' && solution !== '') {
+        if(problem !== '' && solution !== '' && roles.length != 0) {
+            let arr:any = []
+            roles.map((role:any) => (
+                arr.push(role.value)
+            ))
+            
             await fetch(process.env.BASE_URL + '/faq', {
                 headers : { 
                     'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN"),
@@ -37,13 +50,12 @@ function FAQEditPopup(props:any) {
                 body: JSON.stringify({
                     id: id,
                     problem: problem,
-                    solution: solution
+                    solution: solution,
+                    target: arr
                 })
             }).then(res => res.json())
-            .then(() => router.reload())
+            props.refetch()
         }
-
-        
     }
 
     return (
@@ -63,6 +75,17 @@ function FAQEditPopup(props:any) {
                             Solution <div className='text-red'>*</div>
                         </label>
                         <textarea value={solution} name='solution' id='solution' maxLength='500' rows="8" className='border border-gray-300 rounded-md px-3 py-1.5 outline-0 shadow-sm focus:ring-1 focus:border-blue text-smalltext' required onChange={(e) => setSolution(e.target.value)} />
+                    </div>
+                    <div className='flex flex-col mb-6'>
+                        <label htmlFor='description' className='text-smalltext flex whitespace-pre-wrap break-all font-semibold text-gray-700 mb-1'>
+                            Role <div className='text-red'>*</div>
+                        </label>
+                        <MultiSelect
+                            options={option}
+                            value={roles}
+                            onChange={setRoles}
+                            labelledBy="Please select role"
+                        />
                     </div>
                     <div className='h-px bg-secblack my-2' />
                     {

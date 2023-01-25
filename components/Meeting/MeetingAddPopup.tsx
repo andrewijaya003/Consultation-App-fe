@@ -1,72 +1,77 @@
 import { getCookie } from 'cookies-next'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
+import { BiChevronDown } from 'react-icons/bi'
+import { MultiSelect } from 'react-multi-select-component'
+import useSWR from 'swr'
+import { useDebounce } from 'use-debounce'
 import AlertError from '../AlertError'
 import PageTitle2 from '../PageTitle2'
 
+const fetcherStaffs = (endpoint: RequestInfo | URL) =>fetch(endpoint, {
+        headers: {
+            'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+        },
+        method: 'GET',
+    }).then(res => res.json())
+
 function MeetingAddPopup(props:any) {
-    const [studentId, setstudentId] = useState('')
+    const [email, setEmail] = useState('')
     const [code, setCode] = useState('')
     const [date, setDate] = useState('')
     const [time, setTime] = useState('')
     const [description, setDescription] = useState('')
+    const [location, setLocation] = useState('')
     const [errorMsg, setErrorMsg] = useState('')
-    const router = useRouter()
+    const [endpointStaffs, setEnpointStaffs] = useState(process.env.BASE_URL + '/staff')
+    const {data:staffs, mutate:staffsMutate} = useSWR(endpointStaffs, fetcherStaffs)
+    const [pic, setPic] = useState()
+    const [showDP, setShowDP] = useState(false)
 
     useEffect(() => {
-        if(studentId.startsWith('BN')) {
-            fetch(process.env.BASE_URL + '/user/get-user', {
-                headers : { 
-                    'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN"),
-                    'Content-type': 'application/json'
-                },
-                method: 'POST',
-                body: JSON.stringify({
-                    binusianId: studentId
-                })
-            }).then(res => res.json()).then(data => setCode(data.id)).catch(err => console.log(err))
-        } else {
-            fetch(process.env.BASE_URL + '/user/get-user', {
-                headers : { 
-                    'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN"),
-                    'Content-type': 'application/json'
-                },
-                method: 'POST',
-                body: JSON.stringify({
-                    nim: studentId
-                })
-            }).then(res => res.json()).then(data => setCode(data.id)).catch(err => console.log(err))
-        }
-    }, [studentId])
+        setErrorMsg('')
+    }, [props.add])
 
     async function addMeetingHandler() {
-        if(code === undefined) {
-            setErrorMsg('Student ID not found')
+        if(email === '') {
+            setErrorMsg('Email must be filled')
         } else if(date === '') {
             setErrorMsg('Date must be filled')
         } else if(time === '') {
             setErrorMsg('Time must be filled')
         } else if(description === '') {
-            setErrorMsg('Description must be filled')
+            setErrorMsg('Notes for student must be filled')
         }
 
-        if(studentId !== '' && code !== undefined && date !== '' && time !== '' && description !== '') {
-            await fetch(process.env.BASE_URL + '/meeting', {
+        if(email !== '' && date !== '' && time !== '' && description !== '') {
+            const data = await fetch(process.env.BASE_URL + '/meeting', {
                 headers : { 
                     'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN"),
                     'Content-type': 'application/json'
                 },
                 method: 'POST',
                 body: JSON.stringify({
-                    userId: code,
+                    userEmail: email,
                     date: date,
                     time: time,
-                    description: description
+                    description: description,
+                    location: location,
+                    picId: pic.id
                 })
-            }).then(res => res.json()).then(() => router.reload())
+            }).then(res => res.json())
+            
+            console.log(data)
+            if(data?.statusCode > 399) {
+                setErrorMsg(data.message)
+            } else {
+                await props.refetch()
+            }
         }
+    }
 
-        
+    function picIdHandler(value:any) {
+        setPic(value)
+        setShowDP(!showDP)
     }
 
     return (
@@ -76,10 +81,10 @@ function MeetingAddPopup(props:any) {
                 <PageTitle2 title='New Meeting' sectitle='meeting' />
                 <form className='flex flex-col mt-6'>
                     <div className='flex flex-col mb-6'>
-                        <label htmlFor='studentId' className='text-smalltext flex whitespace-pre-wrap break-all font-semibold text-gray-700 mb-1'>
-                            Student ID <div className='text-red'>*</div>
+                        <label htmlFor='email' className='text-smalltext flex whitespace-pre-wrap break-all font-semibold text-gray-700 mb-1'>
+                            Email <div className='text-red'>*</div>
                         </label>
-                        <input name='studentId' id='studentId' type='studentId' className='border border-gray-300 rounded-md px-3 py-1.5 outline-0 shadow-sm focus:ring-1 focus:border-blue text-smalltext' required onChange={(e) => setstudentId(e.target.value)} /> 
+                        <input name='email' id='email' type='email' className='border border-gray-300 rounded-md px-3 py-1.5 outline-0 shadow-sm focus:ring-1 focus:border-blue text-smalltext' required onChange={(e) => setEmail(e.target.value)} /> 
                     </div>
                     <div className='flex flex-col mb-6'>
                         <label htmlFor='date' className='text-smalltext flex whitespace-pre-wrap break-all font-semibold text-gray-700 mb-1'>
@@ -95,9 +100,40 @@ function MeetingAddPopup(props:any) {
                     </div>
                     <div className='flex flex-col mb-6'>
                         <label htmlFor='description' className='text-smalltext flex whitespace-pre-wrap break-all font-semibold text-gray-700 mb-1'>
-                            Description <div className='text-red'>*</div>
+                            Notes for student <div className='text-red'>*</div>
                         </label>
-                        <input name='description' id='description' type='text' className='border border-gray-300 rounded-md px-3 py-1.5 outline-0 shadow-sm focus:ring-1 focus:border-blue text-smalltext' required onChange={(e) => setDescription(e.target.value)} /> 
+                        <textarea name='description' id='description' rows={8} className='border border-gray-300 rounded-md px-3 py-1.5 outline-0 shadow-sm focus:ring-1 focus:border-blue text-smalltext' onChange={(e) => setDescription(e.target.value)} />
+                    </div>
+                    <div className='flex flex-col mb-6'>
+                        <label htmlFor='location' className='text-smalltext flex whitespace-pre-wrap break-all font-semibold text-gray-700 mb-1'>
+                            Location <div className='text-red'>*</div>
+                        </label>
+                        <input name='location' id='location' type='text' className='border border-gray-300 rounded-md px-3 py-1.5 outline-0 shadow-sm focus:ring-1 focus:border-blue text-smalltext' required onChange={(e) => setLocation(e.target.value)} /> 
+                    </div>
+                    <div className='flex flex-col mb-6'>
+                        <label htmlFor="category" className="text-smalltext flex whitespace-pre-wrap break-all font-semibold text-gray-700 mb-1">
+                            PIC <div className='text-red'>*</div>
+                        </label>
+                        <div id='category' className='relative text-smalltext'>
+                            <div className={`flex items-center justify-between border border-gray-300 rounded-md px-1.5 py-2 outline-0 shadow-sm ${showDP ? 'ring-1 border-blue' : ''} hover:cursor-pointer`} onClick={() => setShowDP(!showDP)}>
+                                <div className='px-1.5'>
+                                    {pic === undefined ? 'Choose staff' : pic.name}
+                                </div>
+                                <BiChevronDown size={23} />
+                            </div>
+                            <div className={`${showDP ? 'absolute' : 'hidden'} w-full mt-2 border border-gray-300 shadow-sm rounded-md hover:cursor-pointer z-2 bg-white`}>
+                                {
+                                    staffs ? 
+                                    staffs.map((staff:any) => (
+                                        <div className='hover:bg-gray-300 px-3 py-2' onClick={() => picIdHandler(staff)}>
+                                            {staff.name}
+                                        </div>    
+                                    ))
+                                    :
+                                    <></>
+                                }
+                            </div>
+                        </div>
                     </div>
                     <div className='h-px bg-secblack my-2' />
                     {

@@ -24,12 +24,12 @@ ChartJS.register(
     Legend
 )
 
-import { Bar, Line, Scatter, Bubble } from 'react-chartjs-2'
+import { Bar, Line, Scatter, Bubble } from 'react-chartjs-2' 
 
 function BarChart(props:any) {
 
     return (
-        <Bar data={props.chartData} />
+        <Line data={props.chartData} />
     )
 }
 

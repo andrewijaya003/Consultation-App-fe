@@ -5,9 +5,10 @@ import React, { useEffect, useState } from 'react'
 
 function MeetingDeletePopup(props:any) {
     const [id, setId] = useState('')
-    const router = useRouter()
+    const moment = require('moment')
 
     useEffect(() => {
+        console.log(props.meeting)
         if(props.meeting != undefined) {
             setId(props.meeting.id)
         }
@@ -24,10 +25,8 @@ function MeetingDeletePopup(props:any) {
                 body: JSON.stringify({
                     id: id
                 })
-            }).then(res => res.json()).then(() => router.reload())
+            }).then(res => res.json()).then(props.refetch)
         }
-
-        
     }
 
     return (
@@ -38,7 +37,7 @@ function MeetingDeletePopup(props:any) {
                     <RiDeleteBinLine />
                 </div>
                 <div className='text-smalltitle font-bold my-3 text-center'>
-                    You are about to delete meeting at "{props.meeting.date} || {props.meeting.time}"
+                    You are about to delete meeting at "{ moment(props.meeting.lastUpdatedTime).format('DD MMMM YYYY') } || { moment(props.meeting.lastUpdatedTime).format('h:mm A') }"
                 </div>
                 <div className='text-normal mb-0.5 text-center'>
                     This will delete your meeting

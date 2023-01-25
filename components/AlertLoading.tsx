@@ -9,7 +9,7 @@ function AlertLoading(props:any) {
                 <BsFillInfoCircleFill />
             </div>
             <div className='flex flex-col w-full'>
-                <div className='text-[#1e40af] text-normal font-bold'>
+                <div className='text-[#1e40af] text-smalltext font-bold'>
                     Loading for fetching {props.title}
                 </div>
                 <ReactLoading type={'bubbles'} color={'#00a9e2'} width={40} height={30} /> 

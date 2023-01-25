@@ -1,6 +1,7 @@
 import { getCookie } from 'cookies-next'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
+import { MultiSelect } from 'react-multi-select-component'
 import AlertError from '../AlertError'
 import LabelInput from '../LabelInput'
 import PageTitle2 from '../PageTitle2'
@@ -10,7 +11,20 @@ function AnnouncementEditPopup(props:any) {
     const [description, setDescription] = useState('')
     const [image, setImage] = useState('')
     const [errorMsg, setErrorMsg] = useState('')
-    const router = useRouter()
+    const [option, setOption] = useState([
+        {label:'FS',value:'FS'},
+        {label:'SS',value:'SS'},
+        {label:'STUDENT',value:'STUDENT'}
+    ])
+    const [roles, setRoles] = useState([])
+
+    useEffect(() => {
+        // setTitle('')
+        // setDescription('')
+        // setImage('')
+        // setErrorMsg('')
+        // setRoles([])
+    }, [props.edit])
 
     useEffect(() => {
         if(props.announcement != undefined) {
@@ -25,6 +39,8 @@ function AnnouncementEditPopup(props:any) {
             setErrorMsg('Title must be filled')
         } else if(description == '') {
             setErrorMsg('Description must be filled')
+        } else if(roles.length == 0) {
+            setErrorMsg('Role must be choosen')
         }
 
         if(title !== '' && description !== '') {
@@ -32,8 +48,10 @@ function AnnouncementEditPopup(props:any) {
             announcement.append('id', props.announcement.id)
             announcement.append('title', title)
             announcement.append('description', description)
-            announcement.append('target', 'ALL')
             announcement.append('file', image)
+            roles.map((role:any) => (
+                announcement.append('target[]', role.value)
+            ))
             
             await fetch(process.env.BASE_URL + '/announcement', {
                 headers : { 
@@ -41,10 +59,8 @@ function AnnouncementEditPopup(props:any) {
                 },
                 method: 'PUT',
                 body: announcement
-            }).then(res => res.json()).then(() => router.reload())
-        }
-
-        
+            }).then(res => res.json()).then(props.refetch)
+        }       
     }
 
     return (
@@ -75,9 +91,17 @@ function AnnouncementEditPopup(props:any) {
                             <input id='image' className="w-0 cursor-pointer text-sm rounded-md  bg-white file:border-0" aria-describedby="user_avatar_help" type="file" onChange={(e) => setImage(e.target.files[0])} />
                         </label>
                     </div>
-                    {/* <LabelInput id='title' title='Title' star='*' ex='' type='text' tag='input' value={props.announcement.title} />
-                    <LabelInput id='description' title='Description' star='*' ex='' type='text' tag='textarea'  value={props.announcement.description} />
-                    <LabelInput id='image' title='Image' star='' ex='' type='text' tag='file' /> */}
+                    <div className='flex flex-col mb-6'>
+                        <label htmlFor='description' className='text-smalltext flex whitespace-pre-wrap break-all font-semibold text-gray-700 mb-1'>
+                            Role <div className='text-red'>*</div>
+                        </label>
+                        <MultiSelect
+                            options={option}
+                            value={roles}
+                            onChange={setRoles}
+                            labelledBy="Please select role"
+                        />
+                    </div>
                     <div className='h-px bg-secblack my-2' />
                     {
                         errorMsg !== '' ? <AlertError title={errorMsg} onClose={() => setErrorMsg('')} /> : <></>

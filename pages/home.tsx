@@ -6,47 +6,48 @@ import { getCookie } from 'cookies-next';
 import * as cookie from 'cookie';
 import { useRouter } from 'next/router';
 import AlertLoading from '../components/AlertLoading';
+import useSWR from 'swr';
+import { useDebounce } from 'use-debounce';
+
+const fetcherAll = (endpoint: RequestInfo | URL) =>fetch(endpoint, {
+        headers: {
+            'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+        },
+        method: 'GET',
+    }).then(res => res.json())
 
 function Home() {
     const [add, setAdd] = useState(false)
     const [search, setSearch] = useState('')
-    const [announcements, setAnnouncements] = useState([])
-    const [loading, setLoading] = useState(true)
+    const [endpointAnnouncementAll, setEndpointAnnouncementAll] = useState(process.env.BASE_URL+'/announcement')
+    const {data:announcementAll, mutate:announcementAllMutate} = useSWR(endpointAnnouncementAll, fetcherAll)
+    const [bounceSearch] = useDebounce(search, 1000)
 
     useEffect(() => {
-        if(search != '') {
-            setLoading(true)
-            fetch(process.env.BASE_URL+'/announcement/search/'+search, {
+        console.log(announcementAll)
+    }, [announcementAll])
+
+    const refetch = async () => {
+        await announcementAllMutate()
+        setAdd(false)
+    }
+
+    useEffect(() => {
+        if(bounceSearch != '') {
+            const data = async () => await fetch(process.env.BASE_URL+'/announcement/search/'+bounceSearch, {
                 headers: {
                     'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
                 },
                 method: 'GET',
-            }).then(
-                res => res.json()
-            ).then(data => {
-                setAnnouncements(data)
-                setLoading(false)
-            })
-        } else {
-            setLoading(true)
-            fetch(process.env.BASE_URL+'/announcement', {
-                headers: {
-                    'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
-                },
-                method: 'GET',
-            }).then(
-                res => res.json()
-            ).then(data => {
-                setAnnouncements(data)
-                setLoading(false)
-            })
-        }
-    }, [search])
+            }).then(res => res.json())
+
+            announcementAllMutate(data)
+        } 
+    }, [bounceSearch])
 
     return (
         <div className='max-w-screen-xl w-full px-4 py-5 flex flex-col ml-auto mr-auto'>
             {/* PageTitle Start */}
-            {/* <img src="https://i.postimg.cc/0QZp4JNB/fotoch.jpg" alt="" />/ */}
             <div className='flex flex-col w-full mb-6 text-secblack'>
                 <div className='flex flex-wrap w-full justify-between items-center'>
                     <div className='flex flex-col'>
@@ -55,11 +56,14 @@ function Home() {
                         </div>
                         <div className='h-0.5 bg-secblack my-2'></div>
                     </div>
-                    <div className='flex justify-end' onClick={() => setAdd(true)}>
-                        <input type="submit" value='Add New Announcement' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' />
-                    </div>
+                    {
+                        getCookie('ROLE') === 'STAFF' ? 
+                        <div className='flex justify-end' onClick={() => setAdd(true)}>
+                            <input type="submit" value='Add New Announcement' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' />
+                        </div> : <></>
+                    }
                 </div>
-                <div className="w-96 mt-3">
+                <div className="max-w-sm mt-3">
                     <div className="relative">
                         <input
                             type="text"
@@ -79,9 +83,14 @@ function Home() {
             </div>
             {/* PageTitle End */}
             {
-                loading ? <AlertLoading title='announcements' /> : <AnnouncementList announcements={announcements} />
+                !announcementAll ? 
+                <AlertLoading title='announcements' /> 
+                : 
+                <AnnouncementList announcements={announcementAll} endpoint={endpointAnnouncementAll} />
             }
-            <AnnouncementAddPopup add={add} onClose={() => setAdd(false)} />
+            {
+                getCookie('ROLE') === 'STAFF' ? <AnnouncementAddPopup add={add} onClose={() => setAdd(false)} refetch={refetch} /> : <></>
+            }
         </div>
     )
 }

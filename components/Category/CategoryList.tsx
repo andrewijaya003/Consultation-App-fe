@@ -1,6 +1,7 @@
 import { FiEdit2 } from '@react-icons/all-files/fi/FiEdit2'
 import { RiDeleteBinLine } from '@react-icons/all-files/ri/RiDeleteBinLine'
 import React, { useEffect, useState } from 'react'
+import { mutate } from 'swr'
 import AlertNoData from '../AlertNoData'
 import FAQAddPopup from '../FAQ/FAQAddPopup'
 import FAQList from '../FAQ/FAQList'
@@ -28,6 +29,21 @@ function CategoryList(props:any) {
     function deleteHandler(category:any){
         setDel(true)
         setCategory(category)
+    }
+
+    const refetchAdd = async (categoryId:string) => {
+        await mutate(process.env.BASE_URL+'/faq/faq-by-category/'+categoryId)
+        setAdd(false)
+    }
+
+    const refetchEdit = async () => {
+        await mutate(props.endpoint)
+        setEdit(false)
+    }
+
+    const refetchDel = async () => {
+        await mutate(props.endpoint)
+        setDel(false)
     }
 
     return (
@@ -70,9 +86,9 @@ function CategoryList(props:any) {
                     ))
                 }
             </div>
-            <FAQAddPopup category={category} add={add} onClose={() => setAdd(false)} />
-            <CategoryEditPopup category={category} edit={edit} onClose={() => setEdit(false)} />
-            <CategoryDeletePopup category={category} del={del} onClose={() => setDel(false)} />
+            <FAQAddPopup category={category} add={add} onClose={() => setAdd(false)} refetch={refetchAdd} />
+            <CategoryEditPopup category={category} edit={edit} onClose={() => setEdit(false)} refetch={refetchEdit} />
+            <CategoryDeletePopup category={category} del={del} onClose={() => setDel(false)} refetch={refetchDel} />
         </>
     )
 }

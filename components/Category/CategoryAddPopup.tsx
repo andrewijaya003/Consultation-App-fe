@@ -1,6 +1,6 @@
 import { getCookie } from 'cookies-next'
 import { useRouter } from 'next/router'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import AlertError from '../AlertError'
 import LabelInput from '../LabelInput'
 import PageTitle2 from '../PageTitle2'
@@ -8,7 +8,11 @@ import PageTitle2 from '../PageTitle2'
 function CategoryAddPopup(props:any) {
     const [description, setDescription] = useState('')
     const [errorMsg, setErrorMsg] = useState('')
-    const router = useRouter()
+
+    useEffect(() => {
+        setErrorMsg('')
+    }, [props.add])
+    
 
     async function addCategoryHandler() {
         if(description === '') {
@@ -25,10 +29,8 @@ function CategoryAddPopup(props:any) {
                 body: JSON.stringify({
                     category: description
                 })
-            }).then(res => res.json()).then(() => router.reload())
+            }).then(res => res.json()).then(props.refetch)
         }
-
-        
     }
     
     return (

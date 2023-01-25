@@ -6,7 +6,6 @@ import { json } from 'stream/consumers';
 
 function AnnouncementDeletePopup(props:any) {
     const [id, setId] = useState('')
-    const router = useRouter()
 
     useEffect(() => {
         if(props.announcement != undefined) {
@@ -25,14 +24,12 @@ function AnnouncementDeletePopup(props:any) {
                 body: JSON.stringify({
                     id: id
                 })
-            }).then(res => res.json()).then(() => router.reload()).catch(() => router.reload())
+            }).then(res => res.json()).then(props.refetch)
         }
-
-        
     }
     
     return (
-        props.del ?
+        props.del ? 
         <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-popupbg z-20' onClick={props.onClose}>
             <div className='sm:max-w-screen-sm lg:max-w-screen-xm w-full px-4 py-5 flex flex-col justify-center items-center ml-auto mr-auto text-secblack bg-white rounded-md' onClick={(e) => e.stopPropagation()}>
                 <div className='text-red text-bigtitle shadow-md p-6 rounded-full ring-2 ring-red'>

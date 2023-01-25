@@ -6,19 +6,33 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import Footer from '../components/Layout/Footer'
 import Navbar from '../components/Layout/Navbar'
+import { SWRConfig } from 'swr'
+import { MsalProvider } from "@azure/msal-react";
+import { msalInstance } from "../config/msal";
 
 function MyApp({ Component, pageProps }: AppProps) {
     const router = useRouter()
+    const [showChild, setShowChild] = useState(false)
+
+    useEffect(() => {
+        setShowChild(true)
+    }, [])
+
+    if (!showChild) {
+        return null
+    }
 
     return (
-        <div className='font-mont bg-white text-secblack'>
-            <SkeletonTheme baseColor='#313131' highlightColor='#525252'>
+        // <SWRConfig value={{dedupingInterval: 1000}}>
+        <MsalProvider instance={msalInstance}>
+            <div className='font-mont bg-white text-secblack'>
                 { router.pathname === '/' ? <></> : <Header /> }
                 { router.pathname === '/' ? <></> : <Navbar /> }
                 <Component {...pageProps} />
                 { router.pathname === '/' ? <></> : <Footer /> }
-            </SkeletonTheme>
-        </div>
+            </div>
+        </MsalProvider>
+        // </SWRConfig>
     )
 }
 

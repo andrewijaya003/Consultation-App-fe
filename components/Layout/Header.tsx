@@ -19,11 +19,17 @@ function Header() {
     }, [])
 
     useEffect(() => {
-        axios.get(process.env.BASE_URL+'/staff/me', {
-            headers: {
-                'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN") 
-            }
-        }).then((res) => setUser(res.data))
+        fetch(process.env.BASE_URL+`/${getCookie('ROLE') === 'STAFF' ? 'staff' : 'user'}/me`, {
+            headers : { 
+                'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN"),
+                "Content-Type" : "application/json"
+            },
+            method: 'GET'
+        }).then(
+            res => res.json()
+        ).then((data) => {
+            setUser(data)
+        })
     }, [])
 
     return (
@@ -76,7 +82,7 @@ function Header() {
                     </div>
                 </div>
                 <div className='flex justify-end'>
-                    <div className='text-end sm:text-smalltext lg:text-normal text-secblack drop-shadow-sm border border-gray-300 rounded-md px-3 py-1 mt-2.5'>
+                    <div className='text-end sm:text-smalltext lg:text-normal text-secblack drop-shadow-sm border border-gray-300 rounded-md px-3 py-1 mt-2.5 cursor-default'>
                         { date?.format('MMMM Do YYYY, h:mm:ss A') }
                     </div>
                 </div>

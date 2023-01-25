@@ -9,14 +9,12 @@ function CategoryEditPopup(props:any) {
     const [id, setId] = useState('')
     const [description, setDescription] = useState('')
     const [errorMsg, setErrorMsg] = useState('')
-    const router = useRouter()
 
     useEffect(() => {
-        if(props.category !== undefined) {
-            setId(props.category.id)
-            setDescription(props.category.category)
-        }
-    }, [props.category])
+        setId(props.category.id)
+        setDescription(props.category.category)
+        setErrorMsg('')
+    }, [props.edit])
 
     async function editCategoryHandler() {
         if(description === '') {
@@ -34,10 +32,8 @@ function CategoryEditPopup(props:any) {
                     id: props.category.id,
                     category: description
                 })
-            }).then(res => res.json()).then(() => router.reload())
+            }).then(res => res.json()).then(props.refetch)
         }
-
-        
     }
 
     return (

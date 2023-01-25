@@ -1,9 +1,14 @@
+import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 import { NextRequest, NextResponse } from "next/server";
+import { useState } from "react";
 
 export async function middleware(request:NextRequest) {
     let token = request.cookies.get('ACCESS_TOKEN')
     let refreshToken = request.cookies.get('REFRESH_TOKEN')
     let { pathname } = request.nextUrl
+    // const microsoftIsAuthenticated = useIsAuthenticated();
+	// const { instance, accounts } = useMsal();
+	// const [graphData, setGraphData] = useState(null);
 
     const data = await fetch(process.env.BASE_URL + '/auth/refresh-token', {
         headers: {
@@ -14,6 +19,7 @@ export async function middleware(request:NextRequest) {
             refresh_token: refreshToken
         })
     }).then(data => data.json())
+
     if(data.access_token != undefined){
         token = data.access_token
     } else {
@@ -24,7 +30,8 @@ export async function middleware(request:NextRequest) {
         const response = NextResponse.next()
         if (token == undefined) {
             response.cookies.set('ACCESS_TOKEN', '', {maxAge: 0})
-            response.cookies.set('REFRESH_TOKEN', '', {maxAge: 0})
+            response.cookies.set('REFRESH_TOKEN', '', {maxAge: 0})    
+            response.cookies.set('ROLE', '', {maxAge: 0})
         }
 
         return response;
@@ -34,7 +41,10 @@ export async function middleware(request:NextRequest) {
         request.nextUrl.pathname = '/'
     } else if(pathname == '/' && token != undefined) {
         request.nextUrl.pathname = '/home'
-    } else {
+    } else if(request.cookies.get('ROLE') !== 'STAFF' && (pathname == '/chat' || pathname == '/rating' || pathname == 'manage-category-faq')) {
+        request.nextUrl.pathname = '/404'
+    } 
+    else {
         return NextResponse.next()
     }
 

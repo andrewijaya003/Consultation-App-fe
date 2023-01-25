@@ -1,91 +1,27 @@
 import { getCookie } from 'cookies-next'
 import React, { useEffect, useState } from 'react'
+import useSWR from 'swr'
 import AlertLoading from '../components/AlertLoading'
 import CategoryAddPopup from '../components/Category/CategoryAddPopup'
 import CategoryList from '../components/Category/CategoryList'
-import PageTitle from '../components/PageTitle'
 
-const DUMMY_CATEGORIES = [
-    {
-        id: "1",
-        description: "Log Book",
-        updatedBy: 'AD21-1',
-        lastUpdate: '2022-10-30'
-    },
-    {
-        id: "2",
-        description: "Faculty Supervisor",
-        updatedBy: 'AD21-1',
-        lastUpdate: '2022-10-30'
-    },
-    {
-        id: "3",
-        description: "Site Supervisor",
-        updatedBy: 'AD21-1',
-        lastUpdate: '2022-10-30'
-    },
-    {
-        id: "4",
-        description: "Learning Plan",
-        updatedBy: 'AD21-1',
-        lastUpdate: '2022-10-30'
-    },
-    {
-        id: "5",
-        description: "Final Report",
-        updatedBy: 'AD21-1',
-        lastUpdate: '2022-10-30'
-    }
-]
-
-const DUMMY_FAQS = [
-    {
-        id: '1',
-        categoryId: '1',
-        problem: 'Apakah log book bulan Agustus perlu di accept?',
-        solution: 'Tidak harus di accept',
-        lastUpdate: '2022-10-30',
-        updatedBy: 'AD21-1'
-    },
-    {
-        id: '2',
-        categoryId: '1',
-        problem: 'Log book harus diisi apa?',
-        solution: 'Isi dengan kegiatan yang dilakukan ditanggal tersebut',
-        lastUpdate: '2022-10-30',
-        updatedBy: 'AD21-1'
-    },
-    {
-        id: '3',
-        categoryId: '2',
-        problem: 'Faculty supervisor tidak bisa dihubungi melalu email dan WA?',
-        solution: 'Kami akan coba follow up kepada FS anda untuk segera menghubungi anda',
-        lastUpdate: '2022-10-30',
-        updatedBy: 'AD21-1'
-    },
-    {
-        id: '4',
-        categoryId: '3',
-        problem: 'Apakah site supervisor tidak bisa login website partner?',
-        solution: 'Kami akan bantu follow up ke tim IT untuk mereset aku SS, dimohon untuk mengecek secara berkala',
-        lastUpdate: '2022-10-30',
-        updatedBy: 'AD21-1'
-    },
-    {
-        id: '5',
-        categoryId: '5',
-        problem: 'Final report belum diaccept?',
-        solution: 'Coba terus follow up ke dosen kamu, jika sudah difollow up tapi belu dibalas kami sekarang sudah bantu follow up ke dosennya.',
-        lastUpdate: '2022-10-30',
-        updatedBy: 'AD21-1'
-    }
-]
+const fetcher = (endpoint: RequestInfo | URL) =>fetch(endpoint, {
+        headers: {
+            'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+        },
+        method: 'GET',
+    }).then(res => res.json())
 
 function ManageCategory(props:any) {
     const [add, setAdd] = useState(false)
-    const [categories, setCategories] = useState([])
     const [search, setSearch] = useState('')
-    const [loading, setLoading] = useState(true)
+    const [endpoint, setEndpoint] = useState(process.env.BASE_URL+'/category')
+    const {data, mutate} = useSWR(endpoint, fetcher)
+
+    const refetch = async () => {
+        await mutate()
+        setAdd(false)
+    }
 
     function addHandler(){
         setAdd(true)
@@ -96,19 +32,30 @@ function ManageCategory(props:any) {
     }
 
     useEffect(() => {
-        setLoading(true)
-        fetch(process.env.BASE_URL+'/category', {
-            headers: {
-                'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
-            },
-            method: 'GET',
-        }).then(
-            res => res.json()
-        ).then(data => {
-            setCategories(data)
-            setLoading(false)
-        })
-    }, [])
+        if(search !== '') {
+            fetch(process.env.BASE_URL+'/category/search/'+search, {
+                headers: {
+                    'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+                },
+                method: 'GET',
+            }).then(
+                res => res.json()
+            ).then(data => {
+                mutate(data)
+            })
+        } else {
+            fetch(process.env.BASE_URL+'/category', {
+                headers: {
+                    'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+                },
+                method: 'GET',
+            }).then(
+                res => res.json()
+            ).then(data => {
+                mutate(data)
+            })
+        }
+    }, [search])
 
     return (
         <>
@@ -146,9 +93,9 @@ function ManageCategory(props:any) {
                 </div>
                 {/* PageTitle End */}
                 {
-                    loading ? <AlertLoading title='categories' /> : <CategoryList categories={categories} />
+                    !data ? <AlertLoading title='categories' /> : <CategoryList categories={data} endpoint={endpoint} />
                 }
-                <CategoryAddPopup add={add} onClose={() => setAdd(false)} />
+                <CategoryAddPopup add={add} onClose={() => setAdd(false)} refetch={refetch} />
             </div>
         </>
     )
