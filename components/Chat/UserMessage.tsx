@@ -60,7 +60,7 @@ function UserMessage(props:any) {
                 // user tidak ada before dan tidak ada after
                 moment(props.before?.time).format('hh:mm A') != moment(props.data.time).format('hh:mm A') && moment(props.after?.time).format('hh:mm A') != moment(props.data.time).format('hh:mm A') ?
                 // {`px-3 flex flex-col w-full items-start mt-1.5 ${props.after == undefined ? 'mb-3' : ''}`}
-                    <div id={props.data.id} className={`px-4 flex flex-col w-full  ${props.data.isUnsent ? 'items-center' : 'items-end'} ${props.before == undefined ? 'mt-3' : ''}`}>
+                    <div id={props.data.id} className={`px-4 flex flex-col w-full items-end ${props.before == undefined ? 'mt-3' : ''}`}>
                         {
                             props.data.isUnsent ?
                             <>
@@ -105,7 +105,7 @@ function UserMessage(props:any) {
                     </div> :
                 // user tidak ada before dan ada after
                 moment(props.before?.time).format('hh:mm A') != moment(props.data.time).format('hh:mm A') && moment(props.after?.time).format('hh:mm A') == moment(props.data.time).format('hh:mm A') ?
-                    <div id={props.data.id} className={`px-4 flex flex-col w-full  ${props.data.isUnsent ? 'items-center' : 'items-end'} ${props.before == undefined ? 'mt-3' : ''}`}>
+                    <div id={props.data.id} className={`px-4 flex flex-col w-full items-end ${props.before == undefined ? 'mt-3' : ''}`}>
                         {
                             props.data.isUnsent ?
                             <>
@@ -153,7 +153,7 @@ function UserMessage(props:any) {
                     </div> :
                 // user ada before dan tidak ada after
                 moment(props.before?.time).format('hh:mm A') == moment(props.data.time).format('hh:mm A') && moment(props.after?.time).format('hh:mm A') != moment(props.data.time).format('hh:mm A') ?
-                    <div id={props.data.id} className={`px-4 flex flex-col w-full  ${props.data.isUnsent ? 'items-center' : 'items-end'} mb-2 mt-1.5`}>
+                    <div id={props.data.id} className={`px-4 flex flex-col w-full items-end mb-2 mt-1.5`}>
                         {
                             props.data.isUnsent ?
                             <>
@@ -201,7 +201,7 @@ function UserMessage(props:any) {
                     </div> :
                 // user ada before dan ada after
                 moment(props.before?.time).format('hh:mm A') == moment(props.data.time).format('hh:mm A') && moment(props.after?.time).format('hh:mm A') == moment(props.data.time).format('hh:mm A') ?
-                    <div id={props.data.id} className={`px-4 flex flex-col w-full  ${props.data.isUnsent ? 'items-center' : 'items-end'} mt-1.5`}>
+                    <div id={props.data.id} className={`px-4 flex flex-col w-full items-end mt-1.5`}>
                         {
                             props.data.isUnsent ?
                             <>
@@ -253,7 +253,7 @@ function UserMessage(props:any) {
                 :
             // user image
             props.data.message == null ? 
-            <div id={props.data.id} className={`px-3 flex flex-col w-full ${props.data.isUnsent ? 'items-center' : 'items-end'} mt-1.5 ${props.after == undefined ? 'mb-3' : ''}`}>
+            <div id={props.data.id} className={`px-3 flex flex-col w-full items-end mt-1.5 ${props.after == undefined ? 'mb-3' : ''}`}>
                 {
                     props.data.isUnsent ?
                     <>
@@ -318,7 +318,7 @@ function UserMessage(props:any) {
         props.data.user == null ?
             props.data.message != null ? 
                 moment(props.before?.time).format('hh:mm A') != moment(props.data.time).format('hh:mm A') && moment(props.after?.time).format('hh:mm A') != moment(props.data.time).format('hh:mm A') ?
-                    <div id={props.data.id} className={`px-4 flex flex-col w-full ${props.data.isUnsent ? 'items-center' : 'items-start'} ${props.before == undefined ? 'mt-3' : ''}`}>
+                    <div id={props.data.id} className={`px-4 flex flex-col w-full items-start ${props.before == undefined ? 'mt-3' : ''}`}>
                         {
                             props.data.isUnsent ?
                             <>
@@ -346,7 +346,7 @@ function UserMessage(props:any) {
                         }
                     </div> :
                 moment(props.before?.time).format('hh:mm A') != moment(props.data.time).format('hh:mm A') && moment(props.after?.time).format('hh:mm A') == moment(props.data.time).format('hh:mm A') ?
-                    <div id={props.data.id} className={`px-4 flex flex-col w-full ${props.data.isUnsent ? 'items-center' : 'items-start'} ${props.before == undefined ? 'mt-3' : ''}`}>
+                    <div id={props.data.id} className={`px-4 flex flex-col w-full items-start ${props.before == undefined ? 'mt-3' : ''}`}>
                         {
                             props.data.isUnsent ?
                             <>
@@ -378,7 +378,7 @@ function UserMessage(props:any) {
                         }
                     </div> :
                 moment(props.before?.time).format('hh:mm A') == moment(props.data.time).format('hh:mm A') && moment(props.after?.time).format('hh:mm A') != moment(props.data.time).format('hh:mm A') ?
-                    <div id={props.data.id} className={`px-4 flex flex-col w-full ${props.data.isUnsent ? 'items-center' : 'items-start'} mb-2 mt-1.5`}>
+                    <div id={props.data.id} className={`px-4 flex flex-col w-full items-start mb-2 mt-1.5`}>
                         {
                             props.data.isUnsent ?
                             <>
@@ -409,7 +409,7 @@ function UserMessage(props:any) {
                         }
                     </div> :
                 moment(props.before?.time).format('hh:mm A') == moment(props.data.time).format('hh:mm A') && moment(props.after?.time).format('hh:mm A') == moment(props.data.time).format('hh:mm A') ?
-                    <div id={props.data.id} className={`px-4 flex flex-col w-full ${props.data.isUnsent ? 'items-center' : 'items-start'} mt-1.5`}>
+                    <div id={props.data.id} className={`px-4 flex flex-col w-full items-start mt-1.5`}>
                         {
                             props.data.isUnsent ?
                             <>
@@ -444,7 +444,7 @@ function UserMessage(props:any) {
                     </div> : <></>
                 :
             props.data.message == null ? 
-                <div id={props.data.id} className={`px-3 flex flex-col w-full ${props.data.isUnsent ? 'items-center' : 'items-start'} mt-1.5 ${props.after == undefined ? 'mb-3' : ''}`}>
+                <div id={props.data.id} className={`px-3 flex flex-col w-full items-start mt-1.5 ${props.after == undefined ? 'mb-3' : ''}`}>
                     {
                         props.data.isUnsent ?
                         <>

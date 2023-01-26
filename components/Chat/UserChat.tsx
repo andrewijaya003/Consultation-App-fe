@@ -19,14 +19,24 @@ const fetcher = (endpoint: RequestInfo | URL) =>fetch(endpoint, {
         method: 'GET',
     }).then(res => res.json())
 
+const fetcherUser = (endpoint: RequestInfo | URL) =>fetch(endpoint, {
+        headers: {
+            'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+        },
+        method: 'GET',
+    }).then(res => res.json())
+
 function UserChat(props:any) {
-    const [more, setMore] = useState(false)
+    const container = document.querySelector('#chat-container')
     const [files, setFiles] = useState([])
     const [fixFiles, setFixFiles] = useState([])
     const [message, setMessage] = useState('')
     const [shift, setShift] = useState(false)
-    const [endpointChats, setEndpointChats] = useState(process.env.BASE_URL+'/chat/room/'+props.roomChatId) 
-    const {data: chats, mutate: mutateChats} = useSWR(endpointChats, fetcher)
+    const [chats, setChats] = useState()
+    const [offsetChats, setOffsetChats] = useState(0)
+    const [takeChats, setTakeChats] = useState(3)
+    const [newChats, setNewChats] = useState([])
+    const [isFetchMore, setIsFetchMore] = useState(false)
     const [endpointActiveRoom, setEndpointActiveRoom] = useState(process.env.BASE_URL+'/room-chat/active-user-room-chat')
     const {data: activeRoom, mutate: mutateActiveRoom} = useSWR(endpointActiveRoom, 
     () => fetch(endpointActiveRoom, {
@@ -41,15 +51,25 @@ function UserChat(props:any) {
     const [bounceSearchChat] = useDebounce(searchChat, 1000)
     const [searchChatData, setSearchChatData] = useState([])
     const [indexChat, setIndexChat] = useState(0)
+    const [isTyping, setIstyping] = useState(false)
+    const {data:user, mutate:userMutate} = useSWR(process.env.BASE_URL + '/auth/me', fetcherUser)
     const socket = useMemo<any>(()=>{
         if (!window) return;
+        const socket = io('http://localhost:8000')
+        
+        socket.on('receive-message', ((data) => {
+            // console.log(data)
+            // let arr:any = data.message.concat(chats)
+            setChats([data.data.message, ...chats])
+        }))
 
-        const socket = io('http://localhost:8000');
-        socket.on('receive-message', (data => (
-            console.log(data)
-            // mutateRooms()
-        )))
-        console.log("test");
+        socket.on('client-start-typing', () => {
+            setIstyping(true)
+        })
+    
+        socket.on('client-stop-typing', () => {
+            setIstyping(false)
+        })
 
         return socket;
     }, [window])
@@ -58,7 +78,67 @@ function UserChat(props:any) {
         return () => {
             socket.disconnect()
         }
-    }, []);
+    }, [])
+
+    useEffect(() => {
+        if(user) {
+            socket.emit('user-online', {id: user.id})
+        }
+    }, [user])
+
+    container?.addEventListener('scroll', (e) => {
+        if (container.clientHeight + (container.scrollTop*-1) >= container.scrollHeight-20 && chats != undefined) {
+            setIsFetchMore(true)
+        }
+    })
+
+    useEffect(() => {
+        setIsFetchMore(false)
+        console.log(newChats)
+        if(newChats.length != 0 && chats != undefined) {
+            setChats([...chats, ...newChats])
+        }
+    }, [newChats])
+
+    useEffect(() => {
+        if(isFetchMore) {
+            fetch(process.env.BASE_URL+'/chat/room', {
+                headers: {
+                    'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+                    'Content-type': 'application/json'
+                },
+                method: 'POST',
+                body: JSON.stringify({
+                    userId: props.userId,
+                    offset: offsetChats,
+                    take: takeChats
+                })
+            }).then(res => res.json()).then((data) => {
+                setOffsetChats(takeChats)
+                setTakeChats(takeChats+3)
+                setNewChats(data)
+            })
+        }
+    }, [isFetchMore])
+
+    useEffect(() => {
+        fetch(process.env.BASE_URL+'/chat/room', {
+            headers: {
+                'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+                'Content-type': 'application/json'
+            },
+            method: 'POST',
+            body: JSON.stringify({
+                roomId: props.roomChatId,
+                offset: 0,
+                take: 3
+            })
+        }).then(res => res.json()).then((data) => {
+            setChats(data)
+            setOffsetChats(3)
+            setTakeChats(6)
+        })
+    }, [props.roomChatId])
 
     useEffect(() => {
         if(files.length != 0 ) {
@@ -87,7 +167,6 @@ function UserChat(props:any) {
             setShift(false)
         }
         if(e.key == 'Enter' && !shift && message.trim() != '') {
-            console.log(props.roomChatId)
             let sendChat = new FormData()
             sendChat.append('roomId', props.roomChatId)
             sendChat.append('message', message)
@@ -100,8 +179,7 @@ function UserChat(props:any) {
                 body: sendChat
             }).then((res) => res.json())
             
-            socket.emit('message', {roomId: props.roomChatId, data: data})
-            // mutateChats()
+            socket.emit('message', {message: data})
 
             setMessage('')
         } else if(e.key == 'Enter' && !shift ) {
@@ -109,17 +187,13 @@ function UserChat(props:any) {
         } 
     }
 
-    useEffect(() => {
-        // console.log(activeRoom)
-    }, [activeRoom])
-
     const refetch = async () => {
         await props.fetchRoomChat()
         setAdd(false)
     }
 
     useEffect(() => {
-        console.log(bounceSearchChat)
+        // console.log(bounceSearchChat)
         if(bounceSearchChat != '') {
             fetch(process.env.BASE_URL + '/chat/active-or-not-rated-room/'+searchChat, {
                 headers : { 
@@ -134,7 +208,7 @@ function UserChat(props:any) {
     }, [bounceSearchChat])
 
     useEffect(() => {
-        console.log(searchChatData)
+        // console.log(searchChatData)
         setIndexChat(searchChatData.length-1)
         document.getElementById(searchChatData[indexChat]?.id)?.scrollIntoView()
     }, [searchChatData])
@@ -151,9 +225,25 @@ function UserChat(props:any) {
 
     useEffect(() => {
         // console.log(indexChat)
-        console.log(searchChatData[indexChat])
+        // console.log(searchChatData[indexChat])
         document.getElementById(searchChatData[indexChat]?.id)?.scrollIntoView()
     }, [indexChat])
+
+    // useEffect(() => {
+    //     mutateChats()
+    // }, [props.roomChatId])
+
+    useEffect(() => {
+        console.log(chats)
+    }, [chats])
+
+    useEffect(() => {
+        if(message != '') {
+            socket.emit('start-typing')
+        } else {
+            socket.emit('stop-typing')
+        }
+    }, [message])
     
     return (
         <>
@@ -172,9 +262,19 @@ function UserChat(props:any) {
                         }
                     </div>
                 </div>
-                <div className='flex flex-col flex-col-reverse w-full h-[420px] display-scrollbar'>
+                <div className='flex flex-col flex-col-reverse w-full h-[420px] display-scrollbar' id='chat-contianer'>
                     {
-                        !chats ?
+                        isTyping ?
+                        <div className={`animate-pulse px-4 flex flex-col w-full items-start my-3`}>
+                            <div className='bg-gray-200 max-w-2xl py-1 px-2 rounded-lg text-smalltext font-bold'>
+                                Is typing a message . . .
+                            </div>
+                        </div> 
+                        :
+                        <></>
+                    }
+                    {
+                        chats == undefined ?
                         <div className='flex w-full h-full justify-center items-center bg-white'>
                             <ReactLoading type={'spin'} color={'#b4b4b4'} width={50} height={50} />
                         </div> :
@@ -185,6 +285,9 @@ function UserChat(props:any) {
                 </div>
                 <div className='flex flex-col justify-between w-full h-[110px] border-t border-gray-300 relative'>
                     {
+                        !activeRoom ?
+                        <></>
+                        :
                         activeRoom != undefined ?
                         <>
                             <div className='flex w-full h-[60px] items-start'>

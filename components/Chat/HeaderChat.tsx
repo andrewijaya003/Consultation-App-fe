@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 
 function HeaderChat(props:any) {
     return (
         props.header.lastChat != null ?
-        <div className='px-4 py-3 flex w-full hover:cursor-pointer hover:bg-gray-100' onClick={props.getChats}>
+        <div className='px-4 py-3 flex h-[700px] w-full hover:cursor-pointer hover:bg-gray-100' onClick={props.getChats}>
             {
                 props.header?.user.user_picture != undefined || props.header?.user.user_picture != null ?
                 <div className='relative w-full h-full top-0'>

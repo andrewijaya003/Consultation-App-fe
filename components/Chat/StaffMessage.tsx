@@ -60,7 +60,7 @@ function UserMessage(props:any) {
                 // user tidak ada before dan tidak ada after
                 moment(props.before?.time).format('hh:mm A') != moment(props.data.time).format('hh:mm A') && moment(props.after?.time).format('hh:mm A') != moment(props.data.time).format('hh:mm A') ?
                 // {`px-3 flex flex-col w-full items-start mt-1.5 ${props.after == undefined ? 'mb-3' : ''}`}
-                    <div id={props.data.id} className={`px-4 flex flex-col w-full  ${props.data.isUnsent ? 'items-center' : 'items-end'} ${props.before == undefined ? 'mt-3' : ''}`}>
+                    <div id={props.data.id} className={`px-4 flex flex-col w-full items-end ${props.before == undefined ? 'mt-3' : ''}`}>
                         {
                             props.data.isUnsent ?
                             <>
@@ -105,7 +105,7 @@ function UserMessage(props:any) {
                     </div> :
                 // staff tidak ada before dan ada after
                 moment(props.before?.time).format('hh:mm A') != moment(props.data.time).format('hh:mm A') && moment(props.after?.time).format('hh:mm A') == moment(props.data.time).format('hh:mm A') ?
-                    <div id={props.data.id} className={`px-4 flex flex-col w-full  ${props.data.isUnsent ? 'items-center' : 'items-end'} ${props.before == undefined ? 'mt-3' : ''}`}>
+                    <div id={props.data.id} className={`px-4 flex flex-col w-full items-end ${props.before == undefined ? 'mt-3' : ''}`}>
                         {
                             props.data.isUnsent ?
                             <>
@@ -153,7 +153,7 @@ function UserMessage(props:any) {
                     </div> :
                 // staff ada before dan tidak ada after
                 moment(props.before?.time).format('hh:mm A') == moment(props.data.time).format('hh:mm A') && moment(props.after?.time).format('hh:mm A') != moment(props.data.time).format('hh:mm A') ?
-                    <div id={props.data.id} className={`px-4 flex flex-col w-full  ${props.data.isUnsent ? 'items-center' : 'items-end'} mt-1.5`}>
+                    <div id={props.data.id} className={`px-4 flex flex-col w-full items-end mt-1.5`}>
                         {
                             props.data.isUnsent ?
                             <>
@@ -201,7 +201,7 @@ function UserMessage(props:any) {
                     </div> :
                 // staff ada before dan ada after
                 moment(props.before?.time).format('hh:mm A') == moment(props.data.time).format('hh:mm A') && moment(props.after?.time).format('hh:mm A') == moment(props.data.time).format('hh:mm A') ?
-                    <div id={props.data.id} className={`px-4 flex flex-col w-full  ${props.data.isUnsent ? 'items-center' : 'items-end'} mt-1.5`}>
+                    <div id={props.data.id} className={`px-4 flex flex-col w-full items-end mt-1.5`}>
                         {
                             props.data.isUnsent ?
                             <>
@@ -253,7 +253,7 @@ function UserMessage(props:any) {
                 :
             // staff image
             props.data.message == null ? 
-            <div id={props.data.id} className={`px-3 flex flex-col w-full ${props.data.isUnsent ? 'items-center' : 'items-end'} mt-1.5 ${props.after == undefined ? 'mb-3' : ''}`}>
+            <div id={props.data.id} className={`px-3 flex flex-col w-full items-end mt-1.5 ${props.after == undefined ? 'mb-3' : ''}`}>
                 {
                     props.data.isUnsent ?
                     <>
@@ -319,7 +319,7 @@ function UserMessage(props:any) {
             props.data.message != null && props.data.message?.trim() != '' ? 
                 moment(props.before?.time).format('hh:mm A') != moment(props.data.time).format('hh:mm A') && moment(props.after?.time).format('hh:mm A') != moment(props.data.time).format('hh:mm A') ?
                 // className={`px-4 flex flex-col w-full  ${props.data.isUnsent ? 'items-center' : 'items-end'} ${props.before == undefined ? 'mt-3' : ''}`}
-                    <div id={props.data.id} className={`px-4 flex flex-col w-full  ${props.data.isUnsent ? 'items-center' : 'items-start'} ${props.before == undefined ? 'mt-3' : ''}`}>
+                    <div id={props.data.id} className={`px-4 flex flex-col w-full items-start ${props.before == undefined ? 'mt-3' : ''}`}>
                         {
                             props.data.isUnsent ?
                             <>
@@ -346,7 +346,7 @@ function UserMessage(props:any) {
                         }
                     </div> :
                 moment(props.before?.time).format('hh:mm A') != moment(props.data.time).format('hh:mm A') && moment(props.after?.time).format('hh:mm A') == moment(props.data.time).format('hh:mm A') ?
-                    <div id={props.data.id} className={`px-4 flex flex-col w-full  ${props.data.isUnsent ? 'items-center' : 'items-start'} ${props.before == undefined ? 'mt-3' : ''}`}>
+                    <div id={props.data.id} className={`px-4 flex flex-col w-full items-start ${props.before == undefined ? 'mt-3' : ''}`}>
                         {
                             props.data.isUnsent ?
                             <>
@@ -377,7 +377,7 @@ function UserMessage(props:any) {
                         }
                     </div> :
                 moment(props.before?.time).format('hh:mm A') == moment(props.data.time).format('hh:mm A') && moment(props.after?.time).format('hh:mm A') != moment(props.data.time).format('hh:mm A') ?
-                    <div id={props.data.id} className={`px-4 flex flex-col w-full  ${props.data.isUnsent ? 'items-center' : 'items-start'} mt-1.5`}>
+                    <div id={props.data.id} className={`px-4 flex flex-col w-full items-start mt-1.5`}>
                         {
                             props.data.isUnsent ?
                             <>
@@ -398,7 +398,7 @@ function UserMessage(props:any) {
                                 }
                                 <div onMouseOver={() => setMore(true)} onMouseOut={() => setMore(false)} className='flex items-end hover:cursor-pointer'>
                                     <div className='bg-gray-200 max-w-2xl py-1.5 px-2 rounded-lg text-smalltext'>
-                                        {props.data.message} asdas
+                                        {props.data.message} 
                                     </div>
                                 </div>
                                 <div className='max-w-2xl py-1.5 text-xtinytext text-gray-400'>
@@ -408,7 +408,7 @@ function UserMessage(props:any) {
                         }
                     </div> :
                 moment(props.before?.time).format('hh:mm A') == moment(props.data.time).format('hh:mm A') && moment(props.after?.time).format('hh:mm A') == moment(props.data.time).format('hh:mm A') ?
-                    <div id={props.data.id} className={`px-4 flex flex-col w-full  ${props.data.isUnsent ? 'items-center' : 'items-start'} mt-1.5`}>
+                    <div id={props.data.id} className={`px-4 flex flex-col w-full items-start mt-1.5`}>
                         {
                             props.data.isUnsent ?
                             <>

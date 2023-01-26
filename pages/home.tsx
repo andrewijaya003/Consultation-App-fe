@@ -34,14 +34,12 @@ function Home() {
 
     useEffect(() => {
         if(bounceSearch != '') {
-            const data = async () => await fetch(process.env.BASE_URL+'/announcement/search/'+bounceSearch, {
+            fetch(process.env.BASE_URL+'/announcement/search/'+bounceSearch, {
                 headers: {
                     'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
                 },
                 method: 'GET',
-            }).then(res => res.json())
-
-            announcementAllMutate(data)
+            }).then(res => res.json()).then((data) => announcementAllMutate(data))
         } 
     }, [bounceSearch])
 

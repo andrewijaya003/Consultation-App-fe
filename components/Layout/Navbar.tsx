@@ -1,46 +1,27 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { GiHamburgerMenu } from "@react-icons/all-files/gi/GiHamburgerMenu";
 import { FaSignOutAlt } from "@react-icons/all-files/fa/FaSignOutAlt";
 import axios, {AxiosResponse} from 'axios'
 import { useRouter } from 'next/router';
 import { deleteCookie, getCookie, setCookie } from 'cookies-next';
 import Link from 'next/link';
-import { useMsal } from "@azure/msal-react";
+import { useMsal } from "@azure/msal-react"
 import {io} from 'socket.io-client'
+import useSWR from 'swr'
+
+const fetcher = (endpoint: RequestInfo | URL) =>fetch(endpoint, {
+        headers: {
+            'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+        },
+        method: 'GET',
+    }).then(res => res.json())
 
 function Navbar() {
     const router = useRouter()
     const [hamburger, setHamburger] = useState('hidden')
-    const [user, setUser] = useState()
     const [role, setRole] = useState('')
-    const { instance } = useMsal();
-    // const socket = io('http://localhost:8000')
-
-    // socket.on('connect', () => {
-    //     console.log(socket.id)
-    // })
-
-    useEffect(() => {
-        if(getCookie('ROLE') == 'STAFF') {
-            fetch(process.env.BASE_URL + '/staff/me', {
-                headers : { 
-                    'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN"),
-                },
-                method: 'GET'
-            }).then((res) => res.json()).then(data => setUser(data))
-        } else {
-            fetch(process.env.BASE_URL + '/user/me', {
-                headers : { 
-                    'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN"),
-                },
-                method: 'GET'
-            }).then((res) => res.json()).then(data => setUser(data))
-        }
-    }, [])
-
-    useEffect(() => {
-        // socket.emit('user-online', {id: user?.id})
-    }, [user])
+    const { instance } = useMsal()
+    const {data:user, mutate:userMutate} = useSWR(process.env.BASE_URL + '/auth/me', fetcher)
 
     function hamburgerHandler(){
         if(hamburger === 'hidden'){
@@ -52,7 +33,7 @@ function Navbar() {
 
     async function logoutHandler(){
         if(getCookie("ACCESS_TOKEN") != undefined) {
-            if(getCookie('ROLE') != 'SITE SUPERVISOR') {
+            if(user.role != 'Site Supervisor') {
                 const response = await axios.get(process.env.BASE_URL+'/auth/logout?access_token='+getCookie("ACCESS_TOKEN"), {
                     headers: {
                         "Authorization": "Bearer "+getCookie("ACCESS_TOKEN")

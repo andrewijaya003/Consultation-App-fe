@@ -38,6 +38,10 @@ function AnnouncementList(props:any) {
         setSelectedAnnouncement(selectedAnnouncement)
     }, [edit, del])
 
+    useEffect(() => {
+        console.log(props.announcements)
+    }, [props.announcements])
+
     return (
         <>
             <div className='flex flex-col'>

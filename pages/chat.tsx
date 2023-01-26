@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { BsFillChatDotsFill } from "@react-icons/all-files/bs/BsFillChatDotsFill";
 import {BiCategoryAlt} from "react-icons/bi";
 import {IoIosArrowBack} from "react-icons/io";
@@ -25,12 +25,18 @@ const fetcherCategories = (endpoint: RequestInfo | URL) =>fetch(endpoint, {
         method: 'GET',
     }).then(res => res.json())
 
+const fetcherUser = (endpoint: RequestInfo | URL) =>fetch(endpoint, {
+        headers: {
+            'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+        },
+        method: 'GET',
+    }).then(res => res.json())
+
 function chat() {
-    const [search, setSearch] = useState('')
-    const [more, setMore] = useState(false)
-    const [endpointRooms, setEndpointRooms] = useState(process.env.BASE_URL+'/room-chat/preview-all')
+    const container = document.querySelector('#header-container')
     const [endpointCategories, setEndpointCategories] = useState(process.env.BASE_URL+'/category')
-    const {data: rooms, mutate: mutateRooms} = useSWR(endpointRooms, () => fetcher)
+    // const {data: rooms, mutate: mutateRooms} = useSWR(endpointRooms, () => fetcher)
+    const [rooms, setRooms] = useState<Object[]>()
     const {data: categories, mutate: mutateCategories} = useSWR(endpointCategories, fetcherCategories)
     const [userId, setUserId] = useState('')
     const [categoryId, setCategoryId] = useState('')
@@ -38,24 +44,130 @@ function chat() {
     const [username, setUsername] = useState('')
     const [role, setRole] = useState('')
     const [bounceUsername] = useDebounce(username, 1000) 
-    const [fetcher, setFetcher] = useState()
     const [focusIdComponent, setFocusIdComponent] = useState('')
     const [extraTitle, setExtraTitle] = useState('')
+    const {data:user, mutate:userMutate} = useSWR(process.env.BASE_URL + '/auth/me', fetcherUser)
+    const [offsetRooms, setOffsetRooms] = useState(0)
+    const [takeRooms, setTakeRooms] = useState(1)
+    const [newRooms, setNewRooms] = useState([])
+    const [isFetchMore, setIsFetchMore] = useState(false)
+    const socket = useMemo<any>(()=>{
+        if (!window) return;
+
+        const socket = io('http://localhost:8000')
+
+        return socket;
+    }, [window])
+
+    useEffect(()=>{
+        return () => {
+            socket.disconnect()
+        }
+    }, []);
 
     useEffect(() => {
-        const data = fetch(process.env.BASE_URL+'/room-chat/preview-all', {
-            headers: {
-                'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN')
-            },
-            method: 'GET',
-        }).then(res => res.json())
+        if(user){
+            socket.emit('staff-online', {id: user?.id})
+        }
+    }, [user])
 
-        setFetcher(data)
-    }, [])
+    container?.addEventListener('scroll', (e) => {
+        if (container.clientHeight + container.scrollTop >= container.scrollHeight && rooms != undefined) {
+            setIsFetchMore(true)
+        }
+    })
 
     useEffect(() => {
-        mutateRooms()
-    }, [fetcher])
+        console.log(newRooms)
+        if(newRooms.length != 0 && rooms != undefined) {
+            setRooms([...rooms, ...newRooms])
+        } else {
+            setIsFetchMore(false)
+        }
+    }, [newRooms])
+
+    useEffect(() => {
+        if(isFetchMore && rooms != undefined && offsetRooms != 0) {
+            if(role == '' && categoryId == '' && bounceUsername == ''){
+                console.log(offsetRooms+' a '+takeRooms)
+                fetch(process.env.BASE_URL+'/room-chat/preview-all', {
+                    headers: {
+                        'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+                        'Content-type': 'application/json'
+                    },
+                    method: 'POST',
+                    body: JSON.stringify({
+                        offset: offsetRooms,
+                        take: takeRooms
+                    })
+                }).then(res => res.json()).then((data) => {
+                    setOffsetRooms(takeRooms)
+                    setTakeRooms(takeRooms+1)
+                    setNewRooms(data)
+                })
+                
+            } else if(role != '') {
+                console.log(offsetRooms+' b '+takeRooms)
+                fetch(process.env.BASE_URL+'/room-chat/preview', {
+                    headers: {
+                        'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+                        'Content-type': 'application/json'
+                    },
+                    method: 'POST',
+                    body: JSON.stringify({
+                        role: role,
+                        offset: offsetRooms,
+                        take: takeRooms
+                    })
+                }).then(res => res.json()).then((data) => {
+                    setOffsetRooms(takeRooms)
+                    setTakeRooms(takeRooms+1)
+                    setNewRooms(data)
+                })
+            } else if(categoryId != '') {
+                console.log(offsetRooms+' c '+takeRooms)
+                fetch(process.env.BASE_URL+'/room-chat/preview', {
+                    headers: {
+                        'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+                        'Content-type': 'application/json'
+                    },
+                    method: 'POST',
+                    body: JSON.stringify({
+                        categoryId: categoryId,
+                        offset: offsetRooms,
+                        take: takeRooms
+                    })
+                }).then(res => res.json()).then((data) => {
+                    setOffsetRooms(takeRooms)
+                    setTakeRooms(takeRooms+1)
+                    setNewRooms(data)
+                })
+            } else {
+                console.log(offsetRooms+' d '+takeRooms)
+                fetch(process.env.BASE_URL+'/room-chat/preview', {
+                    headers: {
+                        'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+                        'Content-type': 'application/json'
+                    },
+                    method: 'POST',
+                    body: JSON.stringify({
+                        username: username,
+                        offset: offsetRooms,
+                        take: takeRooms
+                    })
+                }).then(res => res.json()).then((data) => {
+                    setOffsetRooms(takeRooms)
+                    setTakeRooms(takeRooms+1)
+                    setNewRooms(data)
+                })
+            } 
+        }
+    }, [isFetchMore, offsetRooms, rooms])
+
+    useEffect(() => {
+        console.log(rooms)
+        setIsFetchMore(false)
+    }, [rooms])
     
     const handleHeaderChat = (data:any) => {
         setUserId('')
@@ -74,96 +186,138 @@ function chat() {
     }
 
     const handleCategory = (data:any) => {
+        console.log('category')
+        container?.scrollTo(top)
+        setRooms(undefined)
+        setOffsetRooms(0)
+        setTakeRooms(1)
         setRole('')
         setUsername('')
         setCategoryId(data.id)
         setExtraTitle(data.category)
     }
 
-    const handleRole = (role:string) => {
+    const handleRole = (data:string) => {
+        console.log('role')
+        container?.scrollTo(top)
+        setRooms(undefined)
+        setOffsetRooms(0)
+        setTakeRooms(1)
         setCategoryId('')
         setUsername('')
-        setRole(role)
-        setExtraTitle(role)
+        setRole(data)
+        setExtraTitle(data)
     }
     
-    const handleUsername = (username:string) => {
+    const handleUsername = (data:string) => {
+        console.log('username')
+        container?.scrollTo(top)
+        setRooms(undefined)
+        setOffsetRooms(0)
+        setTakeRooms(1)
         setRole('')
         setCategoryId('')
-        setUsername(username)
-        setExtraTitle(username)
+        setUsername(data)
+        setExtraTitle(data)
     }
 
     const refetchRooms = async () => {
-        const data = await fetch(process.env.BASE_URL+'/room-chat/preview-all', {
-                headers: {
-                    'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN')
-                },
-                method: 'GET',
-            }).then(res => res.json()
-        )
-        
-        setFetcher(data)
+        console.log(offsetRooms+' e '+takeRooms)
+        await fetch(process.env.BASE_URL+'/room-chat/preview-all', {
+            headers: {
+                'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+                'Content-type': 'application/json'
+            },
+            method: 'POST',
+            body: JSON.stringify({
+                offset: 0,
+                take: 1
+            })
+        }).then(res => res.json()).then(data => {
+            setRooms(data)
+            setOffsetRooms(1)
+            setTakeRooms(2)
+        })
     }
 
     const refetchRoomsFilter = async (role:string, categoryId:string, username:string) => {
         if(role != '') {
-            const data = await fetch(process.env.BASE_URL+'/room-chat/preview', {
-                    headers: {
-                        'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
-                        'Content-type': 'application/json'
-                    },
-                    method: 'POST',
-                    body: JSON.stringify({
-                        role: role
-                    })
-                }).then(res => res.json()
-            )
-            
-            setFetcher(data)
+            console.log(offsetRooms+' f '+takeRooms)
+            await fetch(process.env.BASE_URL+'/room-chat/preview', {
+                headers: {
+                    'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+                    'Content-type': 'application/json'
+                },
+                method: 'POST',
+                body: JSON.stringify({
+                    role: role,
+                    offset: 0,
+                    take: 1
+                })
+            }).then(res => res.json()).then(data => {
+                setRooms(data)
+                setOffsetRooms(1)
+                setTakeRooms(2)
+            })
         } else if(categoryId != '') {
-            const data = await fetch(process.env.BASE_URL+'/room-chat/preview', {
-                    headers: {
-                        'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
-                        'Content-type': 'application/json'
-                    },
-                    method: 'POST',
-                    body: JSON.stringify({
-                        categoryId: categoryId
-                    })
-                }).then(res => res.json()
-            )
-            
-            setFetcher(data)
+            console.log(offsetRooms+' g '+takeRooms)
+            await fetch(process.env.BASE_URL+'/room-chat/preview', {
+                headers: {
+                    'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+                    'Content-type': 'application/json'
+                },
+                method: 'POST',
+                body: JSON.stringify({
+                    categoryId: categoryId,
+                    offset: 0,
+                    take: 1
+                })
+            }).then(res => res.json()).then(data => {
+                setRooms(data)
+                setOffsetRooms(1)
+                setTakeRooms(2)
+            })
         } else {
-            const data = await fetch(process.env.BASE_URL+'/room-chat/preview', {
-                    headers: {
-                        'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
-                        'Content-type': 'application/json'
-                    },
-                    method: 'POST',
-                    body: JSON.stringify({
-                        username: username
-                    })
-                }).then(res => res.json()
-            )
-            
-            setFetcher(data)
+            console.log(offsetRooms+' h '+takeRooms)
+            await fetch(process.env.BASE_URL+'/room-chat/preview', {
+                headers: {
+                    'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+                    'Content-type': 'application/json'
+                },
+                method: 'POST',
+                body: JSON.stringify({
+                    username: username,
+                    offset: 0,
+                    take: 1
+                })
+            }).then(res => res.json()).then(data => {
+                setRooms(data)
+                setOffsetRooms(1)
+                setTakeRooms(2)
+            })
         }
     }
 
     useEffect(() => {
-        if(role == '' && categoryId == '' && bounceUsername == '') {
-            refetchRooms()
-        } else {
-            resetHeaderChat()
-            refetchRoomsFilter(role, categoryId, bounceUsername)
+        if(offsetRooms == 0 && rooms == undefined) {
+            console.log('filter')
+            if(role == '' && categoryId == '' && bounceUsername == '') {
+                refetchRooms()
+            } else {
+                resetHeaderChat()
+                refetchRoomsFilter(role, categoryId, bounceUsername)
+            }
         }
-    }, [role, categoryId, bounceUsername])
+    }, [role, categoryId, bounceUsername, offsetRooms, rooms])
 
-    useEffect(() => {
-        console.log(rooms)
-    }, [rooms])
+    function handleJoinRoomChat(header:Object) {
+        socket.emit('staff-join-user-room', {userId: header.user?.id})
+    }
+
+    function handleJoinRoomChatFilter(header:Object) {
+        setFocusIdComponent(header.lastChat.roomId)
+        socket.emit('staff-join-user-room', {userId: header.user?.id})
+    }
 
     return (
         <div className='max-w-screen-xl w-full px-4 py-5 flex flex-col ml-auto mr-auto'>
@@ -215,22 +369,24 @@ function chat() {
                                 </div> 
                             </Popup>
                         </div>
-                        <div className='md:w-[350px] w-full h-full display-scrollbar'>
+                        <div className='md:w-[350px] w-full h-full display-scrollbar' id='header-container'>
                             {
-                                !rooms ? 
+                                rooms == undefined ? 
                                 <div className='flex w-full h-full justify-center items-center'>
                                     <ReactLoading type={'spin'} color={'#b4b4b4'} width={50} height={50} />
                                 </div> : 
                                 rooms.length != 0 ?
                                     !(rooms.length == 1 && rooms[0].lastChat == null) ?
-                                    rooms.map((header:any) => (
-                                        role == '' && categoryId == '' && bounceUsername == '' ?
-                                        <HeaderChat getChats={() => handleHeaderChat(header)} header={header} />
-                                        :
-                                        <div onClick={() => setFocusIdComponent(header.lastChat.roomId)} >
-                                            <HeaderChat getChats={() => handleHeaderChat(header)} header={header} />
-                                        </div>
-                                    )) 
+                                        rooms.map((header:any) => (
+                                            role == '' && categoryId == '' && bounceUsername == '' ?
+                                            <div onClick={() => handleJoinRoomChat(header)}>
+                                                <HeaderChat socket={socket} getChats={() => handleHeaderChat(header)} header={header} />
+                                            </div>
+                                            :
+                                            <div onClick={() => handleJoinRoomChatFilter(header)} >
+                                                <HeaderChat socket={socket} getChats={() => handleHeaderChat(header)} header={header} />
+                                            </div>
+                                        )) 
                                     :
                                     <div className='px-4 py-3 flex justify-center items-center w-full h-full text-smalltext text-gray-400'>
                                         No chat found.
@@ -253,7 +409,7 @@ function chat() {
                                 Start a new conversation!
                             </div>
                         </div> :
-                        <StaffChat userId={userId} focusIdComponent={focusIdComponent} roomChatId={roomChatId} endpointRooms={endpointRooms} resetUserId={() => resetHeaderChat()} />
+                        <StaffChat socket={socket} userId={userId} focusIdComponent={focusIdComponent} roomChatId={roomChatId} resetUserId={() => resetHeaderChat()} />
                     }
                 </div>
             </div>

@@ -19,7 +19,16 @@ const fetcher = (endpoint: RequestInfo | URL) =>fetch(endpoint, {
         method: 'GET',
     }).then(res => res.json())
 
+const fetcherUser = (endpoint: RequestInfo | URL) =>fetch(endpoint, {
+        headers: {
+            'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+        },
+        method: 'GET',
+    }).then(res => res.json())
+
+
 function UserChat(props:any) {
+    const container = document.querySelector('#chat-container')
     const [files, setFiles] = useState([])
     const [fixFiles, setFixFiles] = useState([])
     const [message, setMessage] = useState('')
@@ -27,35 +36,95 @@ function UserChat(props:any) {
     const [userId, setUserId] = useState('')
     const [roomChatId, setRoomChatId] = useState('')
     const [endpointRooms, setEndpointRooms] = useState(process.env.BASE_URL+'/room-chat/room-chats-by-user/'+props.userId)
-    const {data: rooms, mutate: mutateRooms} = useSWR(endpointRooms, fetcher)
+    // const {data: rooms, mutate: mutateRooms} = useSWR(endpointRooms, fetcher)
+    const [offsetRooms, setOffsetRooms] = useState(0)
+    const [takeRooms, setTakeRooms] = useState(3)
+    const [newRooms, setNewRooms] = useState([])
+    const [isFetchMore, setIsFetchMore] = useState(false)
+    const [rooms, setRooms] = useState<Object[]>()
     
     const [resolve, setResolve] = useState(false)
     const [searchChat, setSearchChat] = useState('')
     const [bounceSearchChat] = useDebounce(searchChat, 1000)
     const [searchChatData, setSearchChatData] = useState([])
     const [indexChat, setIndexChat] = useState(0)
-    const socket = useMemo<any>(()=>{
-        if (!window) return
-
-        const socket = io('http://localhost:8000')
-        socket.on('receive-message', (data => (
-            console.log(data)
-            // mutateRooms()
-        )))
-        console.log("test")
-
-        return socket
-    }, [window]) 
-
-    useEffect(()=>{
-        return () => {
-            socket.disconnect()
+    const [isTyping, setIstyping] = useState(false)
+    
+    props.socket.on('receive-message', ((data:any) => {
+        console.log('masuk')
+        if(rooms != undefined){
+            if(rooms[0].chats != undefined) {
+                // console.log('b')
+                rooms[0].chats.unshift(data.data.message)
+            }
         }
-    }, []);
+    }))
+
+    props.socket.on('client-start-typing', () => {
+        setIstyping(true)
+    })
+
+    props.socket.on('client-stop-typing', () => {
+        setIstyping(false)
+    })
+
+    container?.addEventListener('scroll', (e) => {
+        if (container.clientHeight + (container.scrollTop*-1) >= container.scrollHeight-20 && rooms != undefined) {
+            setIsFetchMore(true)
+        }
+    })
+
+    useEffect(() => {
+        setIsFetchMore(false)
+        console.log(newRooms)
+        if(newRooms.length != 0 && rooms != undefined) {
+            setRooms([...rooms, ...newRooms])
+        }
+    }, [newRooms])
+
+    useEffect(() => {
+        if(isFetchMore) {
+            fetch(process.env.BASE_URL+'/room-chat/room-chats-by-user/', {
+                headers: {
+                    'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+                    'Content-type': 'application/json'
+                },
+                method: 'POST',
+                body: JSON.stringify({
+                    userId: props.userId,
+                    offset: offsetRooms,
+                    take: takeRooms
+                })
+            }).then(res => res.json()).then((data) => {
+                setOffsetRooms(takeRooms)
+                setTakeRooms(takeRooms+3)
+                setNewRooms(data)
+            })
+        }
+    }, [isFetchMore])
+
+    useEffect(() => {
+        fetch(process.env.BASE_URL+'/room-chat/room-chats-by-user/', {
+            headers: {
+                'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+                'Content-type': 'application/json'
+            },
+            method: 'POST',
+            body: JSON.stringify({
+                userId: props.userId,
+                offset: 0,
+                take: 3
+            })
+        }).then(res => res.json()).then((data) => {
+            setRooms(data)
+            setOffsetRooms(3)
+            setTakeRooms(6)
+        })
+    }, [props.userId])
     
 
     useEffect(() => {
-        console.log(props.focusIdComponent)
+        // console.log(props.focusIdComponent)
         document.getElementById(props.focusIdComponent)?.scrollIntoView()
     }, [props.focusIdComponent])
 
@@ -98,8 +167,7 @@ function UserChat(props:any) {
                 body: sendChat
             }).then((res) => res.json())
 
-            socket.emit('message', {roomId: roomChatId, data: data})
-            // mutateRooms()
+            props.socket.emit('message', {message: data})
 
             setMessage('')
         } else if(e.key == 'Enter' && !shift ) {
@@ -122,17 +190,17 @@ function UserChat(props:any) {
     }, [rooms])
 
     useEffect(() => {
-        console.log('userid '+props.userId)
-        console.log('roomchati '+props.roomChatId)
+        // console.log('userid '+props.userId)
+        // console.log('roomchati '+props.roomChatId)
     }, [])
 
     useEffect(() => {
-        console.log(endpointRooms)
+        // console.log(endpointRooms)
     }, [endpointRooms])
 
     useEffect(() => {
-        console.log(roomChatId)
-        console.log(bounceSearchChat)
+        // console.log(roomChatId)
+        // console.log(bounceSearchChat)
         if(bounceSearchChat != '') {
             fetch(process.env.BASE_URL + '/chat/search', {
                 headers : { 
@@ -151,7 +219,7 @@ function UserChat(props:any) {
     }, [bounceSearchChat])
 
     useEffect(() => {
-        console.log(searchChatData)
+        // console.log(searchChatData)
         setIndexChat(searchChatData.length-1)
         document.getElementById(searchChatData[indexChat]?.id)?.scrollIntoView()
     }, [searchChatData])
@@ -168,11 +236,22 @@ function UserChat(props:any) {
 
     useEffect(() => {
         // console.log(indexChat)
-        console.log(searchChatData[indexChat])
+        // console.log(searchChatData[indexChat])
         document.getElementById(searchChatData[indexChat]?.id)?.scrollIntoView()
     }, [indexChat])
 
+    useEffect(() => {
+        console.log(message)
+        if(message != '') {
+            props.socket.emit('start-typing')
+        } else {
+            props.socket.emit('stop-typing')
+        }
+    }, [message])
 
+    useEffect(() => {
+        console.log(isTyping)
+    }, [isTyping])
     
     return (
         <>
@@ -196,16 +275,26 @@ function UserChat(props:any) {
                         <></>
                     }
                 </div>
-                <div className='flex flex-col flex-col-reverse w-full h-[420px] display-scrollbar'>
+                <div className='flex flex-col flex-col-reverse w-full h-[420px] display-scrollbar' id='chat-container'>
                     {
-                        !rooms ?
+                        isTyping ?
+                        <div className={`animate-pulse px-4 flex flex-col w-full items-start my-3`}>
+                            <div className='bg-gray-200 max-w-2xl py-1 px-2 rounded-lg text-smalltext font-bold'>
+                                Is typing a message . . .
+                            </div>
+                        </div> 
+                        :
+                        <></>
+                    }
+                    {
+                        rooms == undefined ?
                         <div className='flex w-full h-full justify-center items-center bg-white'>
                             <ReactLoading type={'spin'} color={'#b4b4b4'} width={50} height={50} />
                         </div> 
                         :
                         rooms.map((room:any) => (
                             room.chats.map((chat:any, index:BigInteger, arr:any) => (
-                                <StaffMessage key={index} data={chat} before={arr[index+1]} after={arr[index-1]} index={index} mutate={mutateRooms} />
+                                <StaffMessage key={index} data={chat} before={arr[index+1]} after={arr[index-1]} index={index} />
                             )).concat(room.categories.map((category:any) => (
                                 <div id={room.id} className='mx-4 py-1 mt-3 rounded-lg text-tinytext text-gray-400 flex justify-center bg-gray-100'>
                                     {category.category}
@@ -216,6 +305,9 @@ function UserChat(props:any) {
                 </div>
                 <div className='flex flex-col justify-between w-full h-[110px] border-t border-gray-300 relative'>
                     {
+                        rooms == undefined ?
+                        <></>
+                        :
                         rooms && rooms[0].status == 'Pending' ? 
                         <>
                             <div className='flex w-full h-[60px] items-start'>
