@@ -79,18 +79,21 @@ function chat() {
             if(rooms != undefined) {
                 if(data.data.message[0]?.file != null) {
                     rooms.map((room:any) => {
-                        if(room.lastChat.roomId == data.data.message[0].roomId) {
+                        if(room.user.id == data.data.message[0].user.id) {
                             room.lastChat = data.data.message[data.data.message.length-1]
+                            room.status = 'Pending'
                         }
                     })
                 } else {
                     rooms.map((room:any) => {
-                        if(room.lastChat.roomId == data.data.message.roomId) {
+                        if(room.user.id == data.data.message.user.id) {
                             room.lastChat = data.data.message
+                            room.status = 'Pending'
                         }
                     })
                 }
                 setRooms([...rooms])
+                resetHeaderChat()
             }
         }))
 

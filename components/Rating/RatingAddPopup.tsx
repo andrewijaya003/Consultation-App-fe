@@ -4,6 +4,7 @@ import PageTitle2 from '../PageTitle2'
 import { AiFillStar } from "@react-icons/all-files/ai/AiFillStar";
 import { BsFillEmojiFrownFill, BsFillEmojiNeutralFill, BsFillEmojiSmileFill, BsFillEmojiLaughingFill, BsFillEmojiHeartEyesFill } from 'react-icons/bs'
 import { getCookie } from 'cookies-next';
+import { Router, useRouter } from 'next/router';
 
 function RatingAddPopup(props:any) {
     const [description, setDescription] = useState('')
@@ -15,6 +16,7 @@ function RatingAddPopup(props:any) {
     const [three, setThree] = useState(false)
     const [four, setFour] = useState(false)
     const [five, setFive] = useState(false)
+    const router = useRouter()
 
     useEffect(() => {
         setDescription('')
@@ -59,10 +61,12 @@ function RatingAddPopup(props:any) {
                     ratingDescription: description,
                     advice: advice
                 })
-            }).then((res) => res.json())
-            props.resetRoomChatData(undefined)
-            props.mutateRoomChat(undefined)
-            await props.refetch()
+            }).then((res) => res.json()).then(() => {
+                props.resetRoomChatData()
+                props.mutateRoomChat(undefined)
+                props.refetch()
+                router.push('/home')
+            })
         }
     }
 

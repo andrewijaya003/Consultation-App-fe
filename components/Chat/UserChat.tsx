@@ -199,10 +199,6 @@ function UserChat(props:any) {
     }, [chats])
 
     useEffect(() => {
-        console.log(activeRoom)
-    }, [activeRoom])
-
-    useEffect(() => {
         setIsFetchMore(false)
         console.log(newChats)
         if(newChats.length != 0 && chats != undefined) {
@@ -281,6 +277,7 @@ function UserChat(props:any) {
             } else {
                 chats.unshift(data)
             }
+            setChats([...chats])
         }
     }
 
@@ -312,7 +309,7 @@ function UserChat(props:any) {
     }
 
     const refetch = async () => {
-        await props.mutateRoomChat()
+        setIsDisplay(false)
         setAdd(false)
     }
 

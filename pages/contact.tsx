@@ -110,10 +110,6 @@ function contact() {
         setRoomChatData(roomChatData)
     }, [roomChatData])
 
-    const refetchRoomChat = async () => {
-        await mutateRoomChat()
-    }
-
     return (
         <div className='max-w-screen-xl w-full px-4 py-5 flex flex-col ml-auto mr-auto'>
             <div className='flex flex-col w-full text-secblack mb-3'>
@@ -136,7 +132,7 @@ function contact() {
             </div>
             {
                 roomChatData != undefined ?
-                <UserChat chatUs={chatUs} setChatUs={setChatUs} mutateRoomChat={mutateRoomChat} resetRoomChatData={setRoomChatData} roomChatId={roomChatData.id} fetchRoomChat={refetchRoomChat} />
+                <UserChat chatUs={chatUs} setChatUs={setChatUs} mutateRoomChat={mutateRoomChat} resetRoomChatData={() => setRoomChatData(undefined)} roomChatId={roomChatData.id} />
                 :
                 <div className="w-full flex flex-col">
                     {

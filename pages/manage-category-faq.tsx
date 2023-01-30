@@ -1,6 +1,7 @@
 import { getCookie } from 'cookies-next'
 import React, { useEffect, useState } from 'react'
 import useSWR from 'swr'
+import { useDebounce } from 'use-debounce'
 import AlertLoading from '../components/AlertLoading'
 import CategoryAddPopup from '../components/Category/CategoryAddPopup'
 import CategoryList from '../components/Category/CategoryList'
@@ -17,6 +18,7 @@ function ManageCategory(props:any) {
     const [search, setSearch] = useState('')
     const [endpoint, setEndpoint] = useState(process.env.BASE_URL+'/category')
     const {data, mutate} = useSWR(endpoint, fetcher)
+    const [bounceSearch] = useDebounce(search, 1000)
 
     const refetch = async () => {
         await mutate()
@@ -32,21 +34,25 @@ function ManageCategory(props:any) {
     }
 
     useEffect(() => {
-        if(search !== '') {
-            fetch(process.env.BASE_URL+'/category/search/'+search, {
-                headers: {
-                    'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
-                },
-                method: 'GET',
-            }).then(
-                res => res.json()
-            ).then(data => {
-                mutate(data)
-            })
+        if(bounceSearch != '') {
+            setEndpoint(process.env.BASE_URL+'/category/search/'+bounceSearch)
+            mutate()
+            // fetch(process.env.BASE_URL+'/category/search/'+bounceSearch, {
+            //     headers: {
+            //         'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+            //         'Content-type': 'application/json'
+            //     },
+            //     method: 'GET',
+            // }).then(
+            //     res => res.json()
+            // ).then(data => {
+            //     mutate(data)
+            // })
         } else {
             fetch(process.env.BASE_URL+'/category', {
                 headers: {
                     'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+                    'Content-type': 'application/json'
                 },
                 method: 'GET',
             }).then(
@@ -55,7 +61,11 @@ function ManageCategory(props:any) {
                 mutate(data)
             })
         }
-    }, [search])
+    }, [bounceSearch])
+
+    useEffect(() => {
+        console.log(data)
+    }, [data])
 
     return (
         <>

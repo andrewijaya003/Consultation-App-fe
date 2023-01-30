@@ -127,6 +127,7 @@ function UserChat(props:any) {
         if (rooms == undefined) return
 
         props.socket.on('receive-message', ((data:any) => {
+            console.log(data)
             if(rooms != undefined){
                 if(data.data.message[0]?.file != null) {
                     if(rooms[0].chats[0] != undefined) {
@@ -381,10 +382,10 @@ function UserChat(props:any) {
                         :
                         <></>
                     }
-                    <BsInfoCircle size={30} className={`hover:cursor-pointer mr-2`} onClick={() => setUserNotes(true)} />
+                    <BsInfoCircle size={30} className={`hover:cursor-pointer`} onClick={() => setUserNotes(true)} />
                     {
                         rooms && rooms[0].status == 'Pending' ? 
-                        <input type="submit" value='End' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' onClick={() => setResolve(true)} />
+                        <input type="submit" value='End' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer ml-2' onClick={() => setResolve(true)} />
                         :
                         <></>
                     }
@@ -410,35 +411,9 @@ function UserChat(props:any) {
                             room.chats.map((chat:any, index:BigInteger, arr:any) => (
                                 <StaffMessage socketUnsend={socketUnsend} key={index} data={chat} before={arr[index+1]} after={arr[index-1]} index={index} user={user} />
                             )).concat(room.categories.map((category:any) => (
-                                <div id={room.id} className='mx-4 py-1 mt-3 rounded-lg text-tinytext text-gray-400 flex justify-center bg-gray-100 hover:cursor-pointer' onClick={() => endRoomChatPopupHandler(room)}>
+                                <div id={room.id} className='mx-4 py-1 mt-3 rounded-lg text-tinytext text-white flex justify-center bg-blue hover:cursor-pointer' onClick={() => endRoomChatPopupHandler(room)}>
                                     {category.category}
                                 </div>
-                                // <Popup trigger={
-                                //     <div id={room.id} className='mx-4 py-1 mt-3 rounded-lg text-tinytext text-gray-400 flex justify-center bg-gray-100 hover:cursor-pointer'>
-                                //         {category.category}
-                                //     </div>
-                                // } position="bottom left"
-                                // closeOnDocumentClick>
-                                //     {
-                                //         room.problem != null ?
-                                //         <div className={`${'w-['+document.getElementById(room.id)?.clientWidth+'px]'} flex flex-col border border-gray-300 rounded-lg px-3.5 py-3 mb-6 bg-white shadow-xm`}>
-                                //             <div className={`w-full text-smalltext font-bold mb-0.5`}>
-                                //                 Problem:
-                                //             </div>
-                                //             <div className='w-full text-normal white-pre-wrap break-words'>
-                                //                 { room.problem }
-                                //             </div>
-                                //             <div className='w-full text-smalltext font-bold mt-2.5 mb-0.5'>
-                                //                 Solution:
-                                //             </div>
-                                //             <div className='w-full text-normal white-pre-wrap break-words'>
-                                //                 { room.solution }
-                                //             </div>
-                                //         </div>
-                                //         :
-                                //         <></>
-                                //     }
-                                // </Popup>
                             )))
                         ))
                     }
