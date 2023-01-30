@@ -71,14 +71,104 @@ function chat() {
         }
     }, [user])
 
+    useEffect(() => {
+        if(rooms == undefined) return
+
+        socket.on('staff-notification', ((data:any) => {
+            console.log(data)
+            if(rooms != undefined) {
+                if(data.data.message[0]?.file != null) {
+                    rooms.map((room:any) => {
+                        if(room.lastChat.roomId == data.data.message[0].roomId) {
+                            room.lastChat = data.data.message[data.data.message.length-1]
+                        }
+                    })
+                } else {
+                    rooms.map((room:any) => {
+                        if(room.lastChat.roomId == data.data.message.roomId) {
+                            room.lastChat = data.data.message
+                        }
+                    })
+                }
+                setRooms([...rooms])
+            }
+        }))
+
+        return () => {
+            socket.off('staff-notification')
+        }
+    }, [rooms])
+
+    useEffect(() => {
+        if(rooms == undefined) return
+
+        socket.on('room-status-change', ((data:any) => {
+            console.log(data)
+            console.log(rooms)
+            if(rooms != undefined) {
+                if(data.data.message[0]?.file != null) {
+                    console.log('masuk ke file nih')
+                    rooms.map((room:any) => {
+                        if(room.lastChat.roomId == data.data.message[0].id) {
+                            room.lastChat.status = data.data.message[data.data.message.length-1].status
+                            room.status = data.data.message[data.data.message.length-1].status
+                        }
+                    })
+                } else {
+                    rooms.map((room:any) => {
+                        if(room.lastChat.roomId == data.data.message.id) {
+                            console.log('masuk ke tidak file nih')
+                            room.lastChat.status = data.data.message.status
+                            room.status = data.data.message.status
+                        }
+                    })
+                }
+                setRooms([...rooms])
+            }
+        }))
+
+        return () => {
+            socket.off('room-status-change')
+        }
+    }, [rooms])
+
+    function changeHeader(message:any) {
+        if(rooms != undefined) {
+            if(message[0]?.file != null) {
+                rooms.map((room:any) => {
+                    if(room.lastChat.roomId == message[0].roomId) {
+                        room.lastChat = message[message.length-1]
+                    }
+                })
+            } else {
+                rooms.map((room:any) => {
+                    if(room.lastChat.roomId == message.roomId) {
+                        room.lastChat = message
+                    }
+                })
+            }
+            setRooms([...rooms])
+        }
+    }
+
+    function readHeader(roomId:string) {
+        if(rooms != undefined) {
+            rooms.map((room:any) => {
+                if(room.lastChat.roomId == roomId) {
+                    room.lastChat.readTime = new Date()
+                }
+            })
+            setRooms([...rooms])
+        }
+    }
+
     container?.addEventListener('scroll', (e) => {
-        if (container.clientHeight + container.scrollTop >= container.scrollHeight && rooms != undefined) {
+        if (container.clientHeight + container.scrollTop >= container.scrollHeight-20 && rooms != undefined) {
             setIsFetchMore(true)
         }
     })
 
     useEffect(() => {
-        console.log(newRooms)
         if(newRooms.length != 0 && rooms != undefined) {
             setRooms([...rooms, ...newRooms])
         } else {
@@ -89,7 +179,6 @@ function chat() {
     useEffect(() => {
         if(isFetchMore && rooms != undefined && offsetRooms != 0) {
             if(role == '' && categoryId == '' && bounceUsername == ''){
-                console.log(offsetRooms+' a '+takeRooms)
                 fetch(process.env.BASE_URL+'/room-chat/preview-all', {
                     headers: {
                         'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
@@ -107,7 +196,6 @@ function chat() {
                 })
                 
             } else if(role != '') {
-                console.log(offsetRooms+' b '+takeRooms)
                 fetch(process.env.BASE_URL+'/room-chat/preview', {
                     headers: {
                         'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
@@ -125,7 +213,6 @@ function chat() {
                     setNewRooms(data)
                 })
             } else if(categoryId != '') {
-                console.log(offsetRooms+' c '+takeRooms)
                 fetch(process.env.BASE_URL+'/room-chat/preview', {
                     headers: {
                         'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
@@ -143,7 +230,6 @@ function chat() {
                     setNewRooms(data)
                 })
             } else {
-                console.log(offsetRooms+' d '+takeRooms)
                 fetch(process.env.BASE_URL+'/room-chat/preview', {
                     headers: {
                         'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
@@ -165,11 +251,11 @@ function chat() {
     }, [isFetchMore, offsetRooms, rooms])
 
     useEffect(() => {
-        console.log(rooms)
         setIsFetchMore(false)
     }, [rooms])
     
     const handleHeaderChat = (data:any) => {
+        socket.emit('staff-left-room')
         setUserId('')
         setRoomChatId('')
         setUserId(data.user?.id)
@@ -183,14 +269,16 @@ function chat() {
     const resetHeaderChat = () => {
         setUserId('')
         setRoomChatId('')
+        setFocusIdComponent('')
+        socket.emit('staff-left-room')
     }
 
     const handleCategory = (data:any) => {
-        console.log('category')
         container?.scrollTo(top)
         setRooms(undefined)
         setOffsetRooms(0)
         setTakeRooms(1)
+        setFocusIdComponent('')
         setRole('')
         setUsername('')
         setCategoryId(data.id)
@@ -198,11 +286,11 @@ function chat() {
     }
 
     const handleRole = (data:string) => {
-        console.log('role')
         container?.scrollTo(top)
         setRooms(undefined)
         setOffsetRooms(0)
         setTakeRooms(1)
+        setFocusIdComponent('')
         setCategoryId('')
         setUsername('')
         setRole(data)
@@ -210,11 +298,11 @@ function chat() {
     }
     
     const handleUsername = (data:string) => {
-        console.log('username')
         container?.scrollTo(top)
         setRooms(undefined)
         setOffsetRooms(0)
         setTakeRooms(1)
+        setFocusIdComponent('')
         setRole('')
         setCategoryId('')
         setUsername(data)
@@ -222,7 +310,6 @@ function chat() {
     }
 
     const refetchRooms = async () => {
-        console.log(offsetRooms+' e '+takeRooms)
         await fetch(process.env.BASE_URL+'/room-chat/preview-all', {
             headers: {
                 'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
@@ -242,7 +329,6 @@ function chat() {
 
     const refetchRoomsFilter = async (role:string, categoryId:string, username:string) => {
         if(role != '') {
-            console.log(offsetRooms+' f '+takeRooms)
             await fetch(process.env.BASE_URL+'/room-chat/preview', {
                 headers: {
                     'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
@@ -260,7 +346,6 @@ function chat() {
                 setTakeRooms(2)
             })
         } else if(categoryId != '') {
-            console.log(offsetRooms+' g '+takeRooms)
             await fetch(process.env.BASE_URL+'/room-chat/preview', {
                 headers: {
                     'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
@@ -278,7 +363,6 @@ function chat() {
                 setTakeRooms(2)
             })
         } else {
-            console.log(offsetRooms+' h '+takeRooms)
             await fetch(process.env.BASE_URL+'/room-chat/preview', {
                 headers: {
                     'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
@@ -300,7 +384,6 @@ function chat() {
 
     useEffect(() => {
         if(offsetRooms == 0 && rooms == undefined) {
-            console.log('filter')
             if(role == '' && categoryId == '' && bounceUsername == '') {
                 refetchRooms()
             } else {
@@ -312,12 +395,21 @@ function chat() {
 
     function handleJoinRoomChat(header:Object) {
         socket.emit('staff-join-user-room', {userId: header.user?.id})
+        socket.emit('read-all-message', header.lastChat.roomId)
+        readHeader(header.lastChat.roomId)
+        console.log('hallo')
     }
-
+    
     function handleJoinRoomChatFilter(header:Object) {
         setFocusIdComponent(header.lastChat.roomId)
         socket.emit('staff-join-user-room', {userId: header.user?.id})
+        socket.emit('read-all-message', header.lastRoomChatId)
+        readHeader(header.lastRoomChatId)
     }
+
+    useEffect(() => {
+        console.log(rooms)
+    }, [rooms])
 
     return (
         <div className='max-w-screen-xl w-full px-4 py-5 flex flex-col ml-auto mr-auto'>
@@ -409,7 +501,7 @@ function chat() {
                                 Start a new conversation!
                             </div>
                         </div> :
-                        <StaffChat socket={socket} userId={userId} focusIdComponent={focusIdComponent} roomChatId={roomChatId} resetUserId={() => resetHeaderChat()} />
+                        <StaffChat readHeader={readHeader} changeHeader={changeHeader} socket={socket} userId={userId} focusIdComponent={focusIdComponent} roomChatId={roomChatId} resetUserId={() => resetHeaderChat()} />
                     }
                 </div>
             </div>

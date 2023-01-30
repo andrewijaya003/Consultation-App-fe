@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo } from 'react'
+import {RiMore2Fill} from "react-icons/ri"
 
 function HeaderChat(props:any) {
     return (
@@ -25,7 +26,12 @@ function HeaderChat(props:any) {
                 </div>
             </div>
             <div className='flex w-full flex-col items-end'>
-                <div className='rounded-full bg-blue w-2.5 h-2.5 mb-1.5'/>
+                {
+                    props.header.lastChat.readTime == null ?
+                    <div className='rounded-full bg-blue w-2.5 h-2.5 mb-1.5'/>
+                    :
+                    <div className='rounded-full bg-transparent w-2.5 h-2.5 mb-1.5' />
+                }
                 <div className={`text-tinytext text-white ${props.header.status == 'Closed' ? 'bg-red' : props.header.status == 'Done' ? 'bg-[#83d475]' : 'bg-yellow'} p-1 rounded`}>
                     {props.header.status}
                 </div>

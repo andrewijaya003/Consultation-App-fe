@@ -67,10 +67,6 @@ function ResolveChat(props:any) {
         }
 
         if(problem !== '' && solution !== '' && categories.length !== 0 && status != '') {
-            console.log(problem+' '+solution)
-            console.log(new Date())
-            console.log(categoryIds)
-            console.log(status.toUpperCase())
             await fetch(process.env.BASE_URL + '/room-chat', {
                 headers : { 
                     'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN"),
@@ -85,9 +81,13 @@ function ResolveChat(props:any) {
                     status: status.toUpperCase(),
                     categoryIds: categoryIds
                 })
-            }).then((res) => res.json())
-            props.refetch()
-            await props.onClose()
+            }).then((res) => res.json()).then((data) => {
+                props.socket.emit('notify-room-status-change', {message: data})
+                console.log('masuk nih')
+                props.refetch()
+                props.resetUserId()
+                props.onClose()
+            })
         }
     }
 

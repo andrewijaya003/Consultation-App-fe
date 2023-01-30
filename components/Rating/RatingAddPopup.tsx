@@ -60,6 +60,8 @@ function RatingAddPopup(props:any) {
                     advice: advice
                 })
             }).then((res) => res.json())
+            props.resetRoomChatData(undefined)
+            props.mutateRoomChat(undefined)
             await props.refetch()
         }
     }
@@ -73,7 +75,7 @@ function RatingAddPopup(props:any) {
     }
 
     function twoHandler() {
-        setOne(true)
+        setOne(false)
         setTwo(true)
         setThree(false)
         setFour(false)
@@ -81,26 +83,26 @@ function RatingAddPopup(props:any) {
     }
 
     function threeHandler() {
-        setOne(true)
-        setTwo(true)
+        setOne(false)
+        setTwo(false)
         setThree(true)
         setFour(false)
         setFive(false)
     }
 
     function fourHandler() {
-        setOne(true)
-        setTwo(true)
-        setThree(true)
+        setOne(false)
+        setTwo(false)
+        setThree(false)
         setFour(true)
         setFive(false)
     }
 
     function fiveHandler() {
-        setOne(true)
-        setTwo(true)
-        setThree(true)
-        setFour(true)
+        setOne(false)
+        setTwo(false)
+        setThree(false)
+        setFour(false)
         setFive(true)
     }
 

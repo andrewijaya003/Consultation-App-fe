@@ -13,6 +13,7 @@ function AnnouncementList(props:any) {
     const [edit, setEdit] = useState(false)
     const [del, setDel] = useState(false)
     const [selectedAnnouncement, setSelectedAnnouncement] = useState()
+    const [announcements, setAnnouncemets] = useState([])
 
     function editHandler(value:any){
         setSelectedAnnouncement(value)
@@ -40,16 +41,17 @@ function AnnouncementList(props:any) {
 
     useEffect(() => {
         console.log(props.announcements)
+        setAnnouncemets(props.announcements)
     }, [props.announcements])
 
     return (
         <>
             <div className='flex flex-col'>
                 {
-                    props.announcements.length === 0?
+                    announcements.length === 0?
                     <AlertNoData title='announcement' />
                     :
-                    props.announcements.map((announcement:any) => (
+                    announcements.map((announcement:any) => (
                         <div className='text-secblack flex sm:flex-col lg:flex-row sm:items-center lg:items-start border border-gray-300 rounded-lg px-6 py-5 mb-6 bg-white shadow-xm'>
                             {/* <div>{announcement.file.id}</div> */}
                             <img className='max-w-[140px] object-contain w-full lg:mr-6 sm:mb-6 lg:mb-0' src={ announcement.file != null ? process.env.BASE_URL+'/'+announcement.file.id:'https://i.ibb.co/xHzDz3R/announcement-placeholder.png' } />

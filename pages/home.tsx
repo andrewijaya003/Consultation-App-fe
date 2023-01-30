@@ -23,9 +23,9 @@ function Home() {
     const {data:announcementAll, mutate:announcementAllMutate} = useSWR(endpointAnnouncementAll, fetcherAll)
     const [bounceSearch] = useDebounce(search, 1000)
 
-    useEffect(() => {
-        console.log(announcementAll)
-    }, [announcementAll])
+    // useEffect(() => {
+    //     console.log(announcementAll)
+    // }, [announcementAll])
 
     const refetch = async () => {
         await announcementAllMutate()
@@ -34,13 +34,12 @@ function Home() {
 
     useEffect(() => {
         if(bounceSearch != '') {
-            fetch(process.env.BASE_URL+'/announcement/search/'+bounceSearch, {
-                headers: {
-                    'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
-                },
-                method: 'GET',
-            }).then(res => res.json()).then((data) => announcementAllMutate(data))
-        } 
+            setEndpointAnnouncementAll(process.env.BASE_URL+'/announcement/search/'+bounceSearch)
+            announcementAllMutate()
+        } else {
+            setEndpointAnnouncementAll(process.env.BASE_URL+'/announcement')
+            announcementAllMutate()
+        }
     }, [bounceSearch])
 
     return (

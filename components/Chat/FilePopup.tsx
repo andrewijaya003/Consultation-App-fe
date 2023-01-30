@@ -21,7 +21,16 @@ function FilePopup(props:any) {
             },
             method: 'POST',
             body: sendFiles
-        }).then((res) => res.json()).then(props.onClose)
+        }).then((res) => res.json()).then((data) => {
+            props.socket.emit('message', {message: data})
+            props.appendNewChat(data)
+            if(getCookie('ROLE') == 'STAFF') {
+                props.changeHeader(data)
+            } else {
+                props.socket.emit('notify-all-staff', {message: data})
+            }
+            props.onClose()
+        })
     }
     
     return (
@@ -34,23 +43,6 @@ function FilePopup(props:any) {
                     </div>
                     <ImCross size={12} color='rgb(156 163 175)' className='hover:cursor-pointer' onClick={props.onClose} />
                 </div>
-                {/* <div className='text-smalltitle font-bold my-3 text-center'>
-                    You are about to delete "{props.announcement.title}" announcement
-                </div>
-                <div className='text-normal mb-0.5 text-center'>
-                    This will delete your announcement from home
-                </div>
-                <div className='text-normal text-center'>
-                    Are you sure?
-                </div>
-                <div className='flex mt-5'>
-                    <div className='flex justify-end mr-3' onClick={props.onClose}>
-                        <input type="button" value='Cancel' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' />
-                    </div>
-                    <div className='flex justify-end' onClick={deleteAnnouncementHandler}>
-                        <input type="button" value='Delete' className='bg-red text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' />
-                    </div>
-                </div> */}
                 <div className='files-container w-full display-scrollbar'>
                     {
                         props.fixFiles.map((src, index) => (

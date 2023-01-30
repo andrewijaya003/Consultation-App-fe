@@ -11,6 +11,8 @@ import { useDebounce } from 'use-debounce';
 import {io} from 'socket.io-client'
 import RatingAddPopup from '../Rating/RatingAddPopup';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
+import { State } from 'swr/dist/types';
+import AlertLoading from '../AlertLoading';
 
 const fetcher = (endpoint: RequestInfo | URL) =>fetch(endpoint, {
         headers: {
@@ -34,7 +36,7 @@ function UserChat(props:any) {
     const [shift, setShift] = useState(false)
     const [chats, setChats] = useState()
     const [offsetChats, setOffsetChats] = useState(0)
-    const [takeChats, setTakeChats] = useState(3)
+    const [takeChats, setTakeChats] = useState(15)
     const [newChats, setNewChats] = useState([])
     const [isFetchMore, setIsFetchMore] = useState(false)
     const [endpointActiveRoom, setEndpointActiveRoom] = useState(process.env.BASE_URL+'/room-chat/active-user-room-chat')
@@ -45,34 +47,118 @@ function UserChat(props:any) {
         },
         method: 'POST',
     }).then(res => res.json()))
-    // let socket = io('http://localhost:8000', { transports: ['websocket', 'polling', 'flashsocket'] })
+    const [isDisplay, setIsDisplay] = useState(false)
     const [add, setAdd] = useState(false)
     const [searchChat, setSearchChat] = useState('')
     const [bounceSearchChat] = useDebounce(searchChat, 1000)
     const [searchChatData, setSearchChatData] = useState([])
     const [indexChat, setIndexChat] = useState(0)
     const [isTyping, setIstyping] = useState(false)
+    const [scrollBar, setScrollBar] = useState<Number>()
+    const [isActiveRoom, setIsActiveRoom] = useState(true)
     const {data:user, mutate:userMutate} = useSWR(process.env.BASE_URL + '/auth/me', fetcherUser)
     const socket = useMemo<any>(()=>{
         if (!window) return;
+
         const socket = io('http://localhost:8000')
-        
-        socket.on('receive-message', ((data) => {
-            // console.log(data)
-            // let arr:any = data.message.concat(chats)
-            setChats([data.data.message, ...chats])
+
+        return socket;
+    }, [window])
+
+    useEffect(() => {
+        if(chats == undefined) return
+
+        socket.on('user-read-all-message', ((data:any) => {
+            console.log(data)
+            fetch(process.env.BASE_URL+'/chat/read-all-chat/'+data.data, {
+                headers: {
+                    'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+                    'Content-type': 'application/json'
+                },
+                method: 'PUT',
+            }).then(res => res.json()).then((data) => console.log(data))
+
+            if(chats != undefined) {
+                chats.map((chat:any) => {
+                    if(chat.readTime == null && chat.user != null) {
+                        chat.readTime = new Date()
+                    }
+                })
+                setChats([...chats])
+            }
         }))
 
+        return  () => {
+            socket.off('user-read-all-message')
+        }
+    }, [chats])
+
+    useEffect(() => {
+        if(chats == undefined) return 
+
+        socket.on('receive-unsend-message', ((data:any) => {
+            if(chats != undefined) {
+                let index:number = chats?.findIndex(i => i.id === data.data.message.id)
+                chats?.splice(index, 1, data.data.message)
+                setChats([...chats])
+            }
+        }))
+
+        return  () => {
+            socket.off('receive-unsend-message')
+        }
+    }, [chats])
+
+    const socketUnsend = (data:any) => {
+        if(chats != undefined){
+            let index:number = chats.findIndex(i => i.id === data.id)
+            chats.splice(index, 1, data)
+            setChats([...chats])
+        }
+
+        socket.emit('unsend-message', {message: data})
+    }
+
+    useEffect(() => {
+        if(chats == undefined) return
+        
+        socket.on('receive-message', ((data:any) => {
+            if(chats != undefined) {
+                if(data.data.message[0]?.file != null) {
+                    data.data.message.map((message:any) => {
+                        chats?.unshift(message)
+                    })
+                } else {
+                    chats?.unshift(data.data.message)
+                }
+                setChats([...chats])
+            }
+        }))
+
+        return () => {
+            socket.off('receive-message')
+        }
+    }, [chats])
+
+    useEffect(() => {
         socket.on('client-start-typing', () => {
             setIstyping(true)
         })
-    
+
+        return () => {
+            socket.off('client-start-typing')
+        }
+    }, [])
+
+    useEffect(() => {
         socket.on('client-stop-typing', () => {
             setIstyping(false)
         })
 
-        return socket;
-    }, [window])
+        return () => {
+            socket.off('client-stop-typing')
+        }
+    }, [])
 
     useEffect(()=>{
         return () => {
@@ -87,10 +173,34 @@ function UserChat(props:any) {
     }, [user])
 
     container?.addEventListener('scroll', (e) => {
+        setScrollBar(container.scrollTop)
         if (container.clientHeight + (container.scrollTop*-1) >= container.scrollHeight-20 && chats != undefined) {
             setIsFetchMore(true)
         }
     })
+
+    useEffect(() => {
+        socket.emit('read-all-message', props.roomChatId)
+    }, [scrollBar])
+
+    useEffect(() => {
+        if(chats == undefined) return
+
+        socket.on('room-status-change', ((data:any) => {
+            if(chats != undefined) {
+                mutateActiveRoom(undefined)
+                setIsActiveRoom(false)
+            }
+        }))
+
+        return () => {
+            socket.off('room-status-change')
+        }
+    }, [chats])
+
+    useEffect(() => {
+        console.log(activeRoom)
+    }, [activeRoom])
 
     useEffect(() => {
         setIsFetchMore(false)
@@ -109,13 +219,13 @@ function UserChat(props:any) {
                 },
                 method: 'POST',
                 body: JSON.stringify({
-                    userId: props.userId,
+                    roomId: props.roomChatId,
                     offset: offsetChats,
                     take: takeChats
                 })
             }).then(res => res.json()).then((data) => {
                 setOffsetChats(takeChats)
-                setTakeChats(takeChats+3)
+                setTakeChats(takeChats+15)
                 setNewChats(data)
             })
         }
@@ -131,12 +241,12 @@ function UserChat(props:any) {
             body: JSON.stringify({
                 roomId: props.roomChatId,
                 offset: 0,
-                take: 3
+                take: 15
             })
         }).then(res => res.json()).then((data) => {
             setChats(data)
-            setOffsetChats(3)
-            setTakeChats(6)
+            setOffsetChats(15)
+            setTakeChats(30)
         })
     }, [props.roomChatId])
 
@@ -162,6 +272,18 @@ function UserChat(props:any) {
         }
     }
 
+    function appendNewChat(data:any) {
+        if(chats != undefined) {
+            if(data[0]?.file != null) {
+                data.map((message:any) => {
+                    chats.unshift(message)
+                })
+            } else {
+                chats.unshift(data)
+            }
+        }
+    }
+
     async function handleEnterUp(e:any) {
         if(e.key == 'Shift') {
             setShift(false)
@@ -174,21 +296,23 @@ function UserChat(props:any) {
             const data:any = await fetch(process.env.BASE_URL + '/chat', {
                 headers : { 
                     'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN"),
+                    'Content-Disposition': 'form-data'
                 },
                 method: 'POST',
                 body: sendChat
-            }).then((res) => res.json())
-            
-            socket.emit('message', {message: data})
-
-            setMessage('')
+            }).then((res) => res.json()).then((data) => {
+                socket.emit('message', {message: data})
+                socket.emit('notify-all-staff', {message: data})
+                appendNewChat(data)
+                setMessage('')
+            })
         } else if(e.key == 'Enter' && !shift ) {
             setMessage('')
         } 
     }
 
     const refetch = async () => {
-        await props.fetchRoomChat()
+        await props.mutateRoomChat()
         setAdd(false)
     }
 
@@ -224,28 +348,62 @@ function UserChat(props:any) {
     }
 
     useEffect(() => {
-        // console.log(indexChat)
-        // console.log(searchChatData[indexChat])
         document.getElementById(searchChatData[indexChat]?.id)?.scrollIntoView()
     }, [indexChat])
 
-    // useEffect(() => {
-    //     mutateChats()
-    // }, [props.roomChatId])
-
     useEffect(() => {
-        console.log(chats)
+        // console.log(chats)
     }, [chats])
 
     useEffect(() => {
+        console.log(message)
         if(message != '') {
+            socket.emit('read-all-message', props.roomChatId)
             socket.emit('start-typing')
         } else {
             socket.emit('stop-typing')
         }
     }, [message])
+
+    useEffect(() => {
+        // console.log(isFetchMore)
+    }, [isFetchMore])
+
+    useEffect(() => {
+        if(activeRoom != undefined) {
+            if(activeRoom.lastChatTime == null) {
+                console.log(activeRoom)
+                let sendChat = new FormData()
+                sendChat.append('roomId', activeRoom.id)
+                sendChat.append('message', `Kode: ${user.code}\r\nNama: ${user.name}`)
+    
+                fetch(process.env.BASE_URL + '/chat', {
+                    headers : { 
+                        'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN"),
+                        'Content-Disposition': 'form-data'
+                    },
+                    method: 'POST',
+                    body: sendChat
+                }).then((res) => res.json()).then((data) => {
+                    socket.emit('message', {message: data})
+                    socket.emit('notify-all-staff', {message: data})
+                    appendNewChat(data)
+                    setMessage('')
+                })
+            }
+        }
+    }, [activeRoom])
+
+    useEffect(() => {
+        setIsDisplay(false)
+        const timer = setTimeout(() => {
+            setIsDisplay(true)
+        }, 1500);
+        return () => clearTimeout(timer);
+    }, []);
     
     return (
+        isDisplay ?
         <>
             <div className='h-[600px] flex flex-col border border-gray-300 w-full'>    
                 <div className='flex flex-col px-4 h-[70px] justify-center border-b border-gray-300'>
@@ -262,7 +420,7 @@ function UserChat(props:any) {
                         }
                     </div>
                 </div>
-                <div className='flex flex-col flex-col-reverse w-full h-[420px] display-scrollbar' id='chat-contianer'>
+                <div className='flex flex-col flex-col-reverse w-full h-[420px] display-scrollbar' id='chat-container'>
                     {
                         isTyping ?
                         <div className={`animate-pulse px-4 flex flex-col w-full items-start my-3`}>
@@ -278,17 +436,18 @@ function UserChat(props:any) {
                         <div className='flex w-full h-full justify-center items-center bg-white'>
                             <ReactLoading type={'spin'} color={'#b4b4b4'} width={50} height={50} />
                         </div> :
+
                         chats.map((data:any, index:BigInteger, arr:any) => (
-                            <UserMessage key={index} data={data} before={arr[index+1]} after={arr[index-1]} index={index} />
+                            <UserMessage socketUnsend={socketUnsend} socket={socket} key={index} data={data} before={arr[index+1]} after={arr[index-1]} index={index} user={user} />
                         ))
                     }
                 </div>
                 <div className='flex flex-col justify-between w-full h-[110px] border-t border-gray-300 relative'>
                     {
-                        !activeRoom ?
-                        <></>
-                        :
-                        activeRoom != undefined ?
+                        // !activeRoom ?
+                        // <></>
+                        // :
+                        activeRoom ?
                         <>
                             <div className='flex w-full h-[60px] items-start'>
                                 <textarea value={message} placeholder='Enter a message' className='px-3 mt-3 h-full text-smalltext w-full resize-none outline-none' onChange={(e) => setMessage(e.target.value)} onKeyDown={(e) => handleEnterDown(e)} onKeyUp={(e) => handleEnterUp(e)} />
@@ -313,15 +472,16 @@ function UserChat(props:any) {
                 </div>
             </div>
             {
-                fixFiles.length !== 0 ? <FilePopup fixFiles={fixFiles} files={files} onClose={onClose} roomChatId={props.roomChatId} /> : <></>
+                fixFiles.length !== 0 ? <FilePopup appendNewChat={appendNewChat} socket={socket} fixFiles={fixFiles} files={files} onClose={onClose} roomChatId={props.roomChatId} /> : <></>
             }
             {
                 add ? 
-                <RatingAddPopup add={add} onClose={() => setAdd(false)} refetch={refetch} roomChatId={props.roomChatId} /> 
+                <RatingAddPopup resetRoomChatData={props.resetRoomChatData} mutateRoomChat={props.mutateRoomChat} add={add} onClose={() => setAdd(false)} refetch={refetch} roomChatId={props.roomChatId} /> 
                 :
                 <></>
             }
-        </>
+        </> :
+        <AlertLoading title='chat' />
     )
 }
 

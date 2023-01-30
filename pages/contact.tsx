@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {BsFillInfoCircleFill} from '@react-icons/all-files/bs/BsFillInfoCircleFill'
 import {ImCross} from '@react-icons/all-files/im/ImCross'
 import {BiChevronDown} from '@react-icons/all-files/bi/BiChevronDown'
@@ -9,6 +9,7 @@ import AlertNoData from '../components/AlertNoData'
 import AlertError from '../components/AlertError'
 import UserChat from '../components/Chat/UserChat'
 import useSWR from 'swr'
+import { io } from 'socket.io-client'
 
 function contact() {
     const [infoCategory, setInfoCategory] = useState(true)
@@ -19,7 +20,7 @@ function contact() {
     const [infoFAQ, setInfoFAQ] = useState(true)
     const [faqs, setFAQS] = useState([])
     const [loadingFAQ, setLoadingFAQ] = useState(true)
-    // const [roomChat, setRoomChat] = useState('')
+    const [chatUs, setChatUs] = useState(false)
     const [errorMsg, setErrorMsg] = useState('')
     const [ratingStatus, setRatingStatus] = useState(true)
     const [endpointRoomChat, setEndpointRoomChat] = useState(process.env.BASE_URL+'/room-chat/user-not-rated-chat')
@@ -91,6 +92,7 @@ function contact() {
             }).then(
                 res => res.json()
             ).then(async data => {
+                setChatUs(true)
                 setRoomChatData(data)
                 setErrorMsg('')
             }).catch(e => console.log(e))
@@ -104,7 +106,8 @@ function contact() {
     }, [roomChat])
 
     useEffect(() => {
-        // console.log(roomChatData)
+        console.log(roomChatData)
+        setRoomChatData(roomChatData)
     }, [roomChatData])
 
     const refetchRoomChat = async () => {
@@ -133,7 +136,7 @@ function contact() {
             </div>
             {
                 roomChatData != undefined ?
-                <UserChat roomChatId={roomChatData.id} fetchRoomChat={refetchRoomChat} />
+                <UserChat chatUs={chatUs} setChatUs={setChatUs} mutateRoomChat={mutateRoomChat} resetRoomChatData={setRoomChatData} roomChatId={roomChatData.id} fetchRoomChat={refetchRoomChat} />
                 :
                 <div className="w-full flex flex-col">
                     {

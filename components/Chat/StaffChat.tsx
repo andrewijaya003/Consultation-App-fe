@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { ImAttachment } from "@react-icons/all-files/im/ImAttachment";
 import {IoIosArrowBack, IoIosArrowDown, IoIosArrowUp} from "react-icons/io";
+import {BsInfoCircle} from "react-icons/bs";
 import FilePopup from './FilePopup';
 import { getCookie } from 'cookies-next';
 import useSWR, { mutate } from 'swr';
@@ -11,6 +12,9 @@ import {io} from 'socket.io-client'
 import ResolveChat from './ResolveChat';
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { Socket } from 'socket.io';
+import UserNotes from './UserNotes';
+import Popup from 'reactjs-popup';
+import EndRoomChatPopup from './EndRoomChatPopup';
 
 const fetcher = (endpoint: RequestInfo | URL) =>fetch(endpoint, {
         headers: {
@@ -42,6 +46,9 @@ function UserChat(props:any) {
     const [newRooms, setNewRooms] = useState([])
     const [isFetchMore, setIsFetchMore] = useState(false)
     const [rooms, setRooms] = useState<Object[]>()
+    const [userNotes, setUserNotes] = useState(false)
+    const [endRoomChatPopup, setEndRoomChatPopup] = useState(false)
+    const [roomForendRoomChatPopup, setRoomForEndRoomChatPopup] = useState()
     
     const [resolve, setResolve] = useState(false)
     const [searchChat, setSearchChat] = useState('')
@@ -49,34 +56,135 @@ function UserChat(props:any) {
     const [searchChatData, setSearchChatData] = useState([])
     const [indexChat, setIndexChat] = useState(0)
     const [isTyping, setIstyping] = useState(false)
-    
-    props.socket.on('receive-message', ((data:any) => {
-        console.log('masuk')
+    const [scrollBar, setScrollBar] = useState<Number>()
+    const {data:user, mutate:userMutate} = useSWR(process.env.BASE_URL + '/auth/me', fetcherUser)
+
+    useEffect(() => {
+        if (rooms == undefined) return
+
+        props.socket.on('user-read-all-message', ((data:string) => {
+            fetch(process.env.BASE_URL+'/chat/read-all-chat/'+data.data, {
+                headers: {
+                    'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+                    'Content-type': 'application/json'
+                },
+                method: 'PUT',
+            }).then(res => res.json()).then((data) => console.log(data))
+
+            if(rooms != undefined) {
+                rooms?.map((room:any) => {
+                    if(room.id == data.data) {
+                        console.log(room.id+' '+data.data)
+                        room.chats.map((chat:any) => {
+                            if(chat.staff != null) {
+                                console.log('ini chat staff')
+                                chat.readTime = new Date()
+                            }
+                        })
+                    }
+                })
+                setRooms([...rooms])
+            }
+            
+            props.readHeader(data.data)
+        }))
+
+        return () => {
+            props.socket.off('user-read-all-message')
+        }
+    }, [rooms])
+
+    useEffect(() => {
+        if (rooms == undefined) return
+
+        props.socket.on('receive-unsend-message', ((data:any) => {
+            if(rooms != undefined){
+                if(rooms[0].chats[0] != undefined) {
+                    let index:number = rooms[0].chats.findIndex(i => i.id === data.data.message.id)
+                    rooms[0].chats.splice(index, 1, data.data.message)
+                    setRooms([...rooms])
+                }
+            }
+        }))
+
+        return  () => {
+            props.socket.off('receive-unsend-message')
+        }
+    }, [rooms])
+
+    const socketUnsend = (data:any) => {
         if(rooms != undefined){
-            if(rooms[0].chats != undefined) {
-                // console.log('b')
-                rooms[0].chats.unshift(data.data.message)
+            if(rooms[0].chats[0] != undefined) {
+                let index:number = rooms[0].chats.findIndex(i => i.id === data.id)
+                rooms[0].chats.splice(index, 1, data)
+                setRooms([...rooms])
             }
         }
-    }))
+        props.socket.emit('unsend-message', {message: data})
+    }
 
-    props.socket.on('client-start-typing', () => {
-        setIstyping(true)
-    })
+    useEffect(() => {
+        if (rooms == undefined) return
 
-    props.socket.on('client-stop-typing', () => {
-        setIstyping(false)
-    })
+        props.socket.on('receive-message', ((data:any) => {
+            if(rooms != undefined){
+                if(data.data.message[0]?.file != null) {
+                    if(rooms[0].chats[0] != undefined) {
+                        data.data.message.map((message:any) => {
+                            rooms[0].chats.unshift(message)
+                        })
+                    }
+                } else {
+                    if(rooms[0].chats[0] != undefined) {
+                        rooms[0].chats.unshift(data.data.message)
+                    }
+                }
+                setRooms([...rooms])
+            }
+            props.changeHeader(data.data.message)
+        }))
+
+        return () => {
+            props.socket.off('receive-message')
+        }
+    }, [rooms])
+
+    useEffect(() => {
+        props.socket.on('client-start-typing', () => {
+            setIstyping(true)
+        })
+
+        return () => {
+            props.socket.off('client-start-typing')
+        }
+    }, [])
+
+    useEffect(() => {
+        props.socket.on('client-stop-typing', () => {
+            setIstyping(false)
+        })
+
+        return () => {
+            props.socket.off('client-stop-typing')
+        }
+    }, [])
+
 
     container?.addEventListener('scroll', (e) => {
+        setScrollBar(container.scrollTop)
         if (container.clientHeight + (container.scrollTop*-1) >= container.scrollHeight-20 && rooms != undefined) {
             setIsFetchMore(true)
         }
     })
 
     useEffect(() => {
+        if(roomChatId != '') {
+            props.socket.emit('read-all-message', roomChatId)
+        }
+    }, [scrollBar])
+
+    useEffect(() => {
         setIsFetchMore(false)
-        console.log(newRooms)
         if(newRooms.length != 0 && rooms != undefined) {
             setRooms([...rooms, ...newRooms])
         }
@@ -139,7 +247,7 @@ function UserChat(props:any) {
     }, [files])
 
     const onClose = async () => {
-        await mutateRooms()
+        // await mutateRooms()
         setFiles([])
         setFixFiles([])
     }
@@ -147,6 +255,23 @@ function UserChat(props:any) {
     function handleEnterDown(e:any) {
         if(e.key == 'Shift') {
             setShift(true)
+        }
+    }
+
+    function appendNewChat(data:any) {
+        if(rooms != undefined){
+            if(data[0]?.file != null) {
+                if(rooms[0].chats[0] != undefined) {
+                    data.map((message:any) => {
+                        rooms[0].chats.unshift(message)
+                    })
+                }
+            } else {
+                if(rooms[0].chats[0] != undefined) {
+                    rooms[0].chats.unshift(data)
+                }
+            }
+            setRooms([...rooms])
         }
     }
 
@@ -165,11 +290,12 @@ function UserChat(props:any) {
                 },
                 method: 'POST',
                 body: sendChat
-            }).then((res) => res.json())
-
-            props.socket.emit('message', {message: data})
-
-            setMessage('')
+            }).then((res) => res.json()).then((data) => {
+                props.socket.emit('message', {message: data})
+                appendNewChat(data)
+                props.changeHeader(data)
+                setMessage('')
+            })
         } else if(e.key == 'Enter' && !shift ) {
             setMessage('')
         } 
@@ -183,24 +309,13 @@ function UserChat(props:any) {
     }, [props.userId, props.roomChatId])
     
     useEffect(() => {
+        console.log(rooms)
         if(rooms) {
             document.getElementById(props.focusIdComponent)?.scrollIntoView()
         }
-        console.log(rooms)
     }, [rooms])
 
     useEffect(() => {
-        // console.log('userid '+props.userId)
-        // console.log('roomchati '+props.roomChatId)
-    }, [])
-
-    useEffect(() => {
-        // console.log(endpointRooms)
-    }, [endpointRooms])
-
-    useEffect(() => {
-        // console.log(roomChatId)
-        // console.log(bounceSearchChat)
         if(bounceSearchChat != '') {
             fetch(process.env.BASE_URL + '/chat/search', {
                 headers : { 
@@ -209,7 +324,6 @@ function UserChat(props:any) {
                 },
                 method: 'POST',
                 body: JSON.stringify({
-                    // roomChatId: roomChatId,
                     message: bounceSearchChat
                 })
             }).then((res) => res.json()).then((data) => setSearchChatData(data))
@@ -219,7 +333,6 @@ function UserChat(props:any) {
     }, [bounceSearchChat])
 
     useEffect(() => {
-        // console.log(searchChatData)
         setIndexChat(searchChatData.length-1)
         document.getElementById(searchChatData[indexChat]?.id)?.scrollIntoView()
     }, [searchChatData])
@@ -235,23 +348,23 @@ function UserChat(props:any) {
     }
 
     useEffect(() => {
-        // console.log(indexChat)
-        // console.log(searchChatData[indexChat])
         document.getElementById(searchChatData[indexChat]?.id)?.scrollIntoView()
     }, [indexChat])
 
     useEffect(() => {
-        console.log(message)
         if(message != '') {
+            props.socket.emit('read-all-message', roomChatId)
+            props.readHeader(roomChatId)
             props.socket.emit('start-typing')
         } else {
             props.socket.emit('stop-typing')
         }
     }, [message])
 
-    useEffect(() => {
-        console.log(isTyping)
-    }, [isTyping])
+    function endRoomChatPopupHandler(room:any) {
+        setEndRoomChatPopup(true)
+        setRoomForEndRoomChatPopup(room)
+    }
     
     return (
         <>
@@ -268,6 +381,7 @@ function UserChat(props:any) {
                         :
                         <></>
                     }
+                    <BsInfoCircle size={30} className={`hover:cursor-pointer mr-2`} onClick={() => setUserNotes(true)} />
                     {
                         rooms && rooms[0].status == 'Pending' ? 
                         <input type="submit" value='End' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' onClick={() => setResolve(true)} />
@@ -294,11 +408,37 @@ function UserChat(props:any) {
                         :
                         rooms.map((room:any) => (
                             room.chats.map((chat:any, index:BigInteger, arr:any) => (
-                                <StaffMessage key={index} data={chat} before={arr[index+1]} after={arr[index-1]} index={index} />
+                                <StaffMessage socketUnsend={socketUnsend} key={index} data={chat} before={arr[index+1]} after={arr[index-1]} index={index} user={user} />
                             )).concat(room.categories.map((category:any) => (
-                                <div id={room.id} className='mx-4 py-1 mt-3 rounded-lg text-tinytext text-gray-400 flex justify-center bg-gray-100'>
+                                <div id={room.id} className='mx-4 py-1 mt-3 rounded-lg text-tinytext text-gray-400 flex justify-center bg-gray-100 hover:cursor-pointer' onClick={() => endRoomChatPopupHandler(room)}>
                                     {category.category}
                                 </div>
+                                // <Popup trigger={
+                                //     <div id={room.id} className='mx-4 py-1 mt-3 rounded-lg text-tinytext text-gray-400 flex justify-center bg-gray-100 hover:cursor-pointer'>
+                                //         {category.category}
+                                //     </div>
+                                // } position="bottom left"
+                                // closeOnDocumentClick>
+                                //     {
+                                //         room.problem != null ?
+                                //         <div className={`${'w-['+document.getElementById(room.id)?.clientWidth+'px]'} flex flex-col border border-gray-300 rounded-lg px-3.5 py-3 mb-6 bg-white shadow-xm`}>
+                                //             <div className={`w-full text-smalltext font-bold mb-0.5`}>
+                                //                 Problem:
+                                //             </div>
+                                //             <div className='w-full text-normal white-pre-wrap break-words'>
+                                //                 { room.problem }
+                                //             </div>
+                                //             <div className='w-full text-smalltext font-bold mt-2.5 mb-0.5'>
+                                //                 Solution:
+                                //             </div>
+                                //             <div className='w-full text-normal white-pre-wrap break-words'>
+                                //                 { room.solution }
+                                //             </div>
+                                //         </div>
+                                //         :
+                                //         <></>
+                                //     }
+                                // </Popup>
                             )))
                         ))
                     }
@@ -328,10 +468,22 @@ function UserChat(props:any) {
                 </div>
             </div>
             {
-                fixFiles.length !== 0 ? <FilePopup fixFiles={fixFiles} files={files} onClose={onClose} roomChatId={roomChatId} /> : <></>
+                fixFiles.length !== 0 ? <FilePopup changeHeader={props.changeHeader} appendNewChat={appendNewChat} socket={props.socket} fixFiles={fixFiles} files={files} onClose={onClose} roomChatId={roomChatId} /> : <></>
             }
             {
-                resolve ? <ResolveChat resolve={resolve} onClose={() => setResolve(false)} roomChatId={roomChatId} refetch={onClose}  /> : 
+                resolve ? <ResolveChat resetUserId={props.resetUserId} socket={props.socket} resolve={resolve} onClose={() => setResolve(false)} roomChatId={roomChatId} refetch={onClose}  /> : 
+                <></>
+            }
+            {
+                userNotes ?
+                <UserNotes userNotes={userNotes} onClose={() => setUserNotes(false)} userId={props.userId} />
+                :
+                <></>
+            }
+            {
+                endRoomChatPopup ?
+                <EndRoomChatPopup endRoomChatPopup={endRoomChatPopup} room={roomForendRoomChatPopup} onClose={() => setEndRoomChatPopup(false)} />
+                :
                 <></>
             }
         </>

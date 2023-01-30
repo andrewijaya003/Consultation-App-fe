@@ -3,29 +3,14 @@ import { getCookie } from 'cookies-next'
 import React, { useEffect, useState } from 'react'
 import { AiOutlineFolder } from '@react-icons/all-files/ai/AiOutlineFolder'
 import Popup from 'reactjs-popup';
+import {BiCheckDouble, BiCheck} from "react-icons/bi"
 
 function UserMessage(props:any) {
     const [more, setMore] = useState(false)
-    const [user, setUser] = useState({})
     const moment = require('moment')
     const ufs = require("url-file-size")
 
-    useEffect(() => {
-        fetch(process.env.BASE_URL+`/staff/me`, {
-            headers : { 
-                'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN"),
-                "Content-Type" : "application/json"
-            },
-            method: 'GET'
-        }).then(
-            res => res.json()
-        ).then((data) => {
-            setUser(data)
-        })
-    }, []) 
-
     function unsendHanler(chatId:string) {
-        console.log(chatId)
         fetch(process.env.BASE_URL+`/chat/unsend-chat`, {
             headers : { 
                 'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN"),
@@ -35,10 +20,9 @@ function UserMessage(props:any) {
             body: JSON.stringify({
                 chatId: chatId
             })
-        }).then(
-            res => res.json()
-        ).catch(err => console.log(err))
-        props.mutate()
+        }).then(res => res.json()).then((data) => {
+            props.socketUnsend(data)
+        })
     }
 
     async function downloadUsingFetch(url:string, filename:string) {
@@ -59,7 +43,6 @@ function UserMessage(props:any) {
             props.data.message != null && props.data.message?.trim() != '' ? 
                 // user tidak ada before dan tidak ada after
                 moment(props.before?.time).format('hh:mm A') != moment(props.data.time).format('hh:mm A') && moment(props.after?.time).format('hh:mm A') != moment(props.data.time).format('hh:mm A') ?
-                // {`px-3 flex flex-col w-full items-start mt-1.5 ${props.after == undefined ? 'mb-3' : ''}`}
                     <div id={props.data.id} className={`px-4 flex flex-col w-full items-end ${props.before == undefined ? 'mt-3' : ''}`}>
                         {
                             props.data.isUnsent ?
@@ -78,10 +61,10 @@ function UserMessage(props:any) {
                                 </div>
                                 <div onMouseOver={() => setMore(true)} onMouseOut={() => setMore(false)} className='flex items-end hover:cursor-pointer'>
                                     {
-                                        more && props.data.staff?.id == user.id ? 
+                                        more && props.data.staff?.id == props.user.id ? 
                                         <Popup trigger={
                                             <div>
-                                                <RiMoreFill color='rgb(156 163 175)' size={20} className='mr-1.5'/>
+                                                <RiMoreFill color='rgb(107 114 128)' size={20} className='mr-1.5'/>
                                             </div>
                                         } position="bottom left"
                                         closeOnDocumentClick>
@@ -93,8 +76,16 @@ function UserMessage(props:any) {
                                         </Popup>
                                         : <></>
                                     }
-                                    <div className='bg-[#c7eafe] max-w-2xl py-1.5 px-2 rounded-lg text-smalltext'>
-                                        {props.data.message} 
+                                    <div className='bg-[#c7eafe] max-w-2xl py-1.5 px-2 rounded-lg text-smalltext flex justify-between items-end whitespace-pre-wrap break-word'>
+                                        <div>
+                                            {props.data.message} 
+                                        </div>
+                                        {
+                                            props.data.readTime == null ?
+                                            <BiCheck size={15} color={'rgb(107 114 128)'} className='ml-2' />
+                                            :
+                                            <BiCheckDouble size={15} color={'rgb(107 114 128)'} className='ml-2' />
+                                        }
                                     </div>
                                 </div>
                                 <div className='max-w-2xl py-1.5 text-xtinytext text-gray-400'>
@@ -123,10 +114,10 @@ function UserMessage(props:any) {
                                 </div>
                                 <div onMouseOver={() => setMore(true)} onMouseOut={() => setMore(false)} className='flex items-end hover:cursor-pointer'>
                                     {
-                                        more && props.data.staff?.id == user.id ? 
+                                        more && props.data.staff?.id == props.user.id ? 
                                         <Popup trigger={
                                             <div>
-                                                <RiMoreFill color='rgb(156 163 175)' size={20} className='mr-1.5'/>
+                                                <RiMoreFill color='rgb(107 114 128)' size={20} className='mr-1.5'/>
                                             </div>
                                         } position="bottom left"
                                         closeOnDocumentClick>
@@ -138,8 +129,16 @@ function UserMessage(props:any) {
                                         </Popup>
                                         : <></>
                                     }
-                                    <div className='bg-[#c7eafe] max-w-2xl py-1.5 px-2 rounded-lg text-smalltext'>
-                                        {props.data.message} 
+                                    <div className='bg-[#c7eafe] max-w-2xl py-1.5 px-2 rounded-lg text-smalltext flex justify-between items-end whitespace-pre-wrap break-word'>
+                                        <div>
+                                            {props.data.message} 
+                                        </div>
+                                        {
+                                            props.data.readTime == null ?
+                                            <BiCheck size={15} color={'rgb(107 114 128)'} className='ml-2' />
+                                            :
+                                            <BiCheckDouble size={15} color={'rgb(107 114 128)'} className='ml-2' />
+                                        }
                                     </div>
                                 </div>
                                 {
@@ -174,10 +173,10 @@ function UserMessage(props:any) {
                                 }
                                 <div onMouseOver={() => setMore(true)} onMouseOut={() => setMore(false)} className='flex items-end hover:cursor-pointer'>
                                     {
-                                        more && props.data.staff?.id == user.id ? 
+                                        more && props.data.staff?.id == props.user.id ? 
                                         <Popup trigger={
                                             <div>
-                                                <RiMoreFill color='rgb(156 163 175)' size={20} className='mr-1.5'/>
+                                                <RiMoreFill color='rgb(107 114 128)' size={20} className='mr-1.5'/>
                                             </div>
                                         } position="bottom left"
                                         closeOnDocumentClick>
@@ -189,8 +188,16 @@ function UserMessage(props:any) {
                                         </Popup>
                                         : <></>
                                     }
-                                    <div className='bg-[#c7eafe] max-w-2xl py-1.5 px-2 rounded-lg text-smalltext'>
-                                        {props.data.message} 
+                                    <div className='bg-[#c7eafe] max-w-2xl py-1.5 px-2 rounded-lg text-smalltext flex justify-between items-end whitespace-pre-wrap break-word'>
+                                        <div>
+                                            {props.data.message} 
+                                        </div>
+                                        {
+                                            props.data.readTime == null ?
+                                            <BiCheck size={15} color={'rgb(107 114 128)'} className='ml-2' />
+                                            :
+                                            <BiCheckDouble size={15} color={'rgb(107 114 128)'} className='ml-2' />
+                                        }
                                     </div>
                                 </div>
                                 <div className='max-w-2xl py-1.5 text-xtinytext text-gray-400'>
@@ -222,10 +229,10 @@ function UserMessage(props:any) {
                                 }
                                 <div onMouseOver={() => setMore(true)} onMouseOut={() => setMore(false)} className='flex items-end hover:cursor-pointer'>
                                     {
-                                        more && props.data.staff?.id == user.id ? 
+                                        more && props.data.staff?.id == props.user.id ? 
                                         <Popup trigger={
                                             <div>
-                                                <RiMoreFill color='rgb(156 163 175)' size={20} className='mr-1.5'/>
+                                                <RiMoreFill color='rgb(107 114 128)' size={20} className='mr-1.5'/>
                                             </div>
                                         } position="bottom left"
                                         closeOnDocumentClick>
@@ -237,8 +244,16 @@ function UserMessage(props:any) {
                                         </Popup>
                                         : <></>
                                     }
-                                    <div className='bg-[#c7eafe] max-w-2xl py-1.5 px-2 rounded-lg text-smalltext'>
-                                        {props.data.message} 
+                                    <div className='bg-[#c7eafe] max-w-2xl py-1.5 px-2 rounded-lg text-smalltext flex justify-between items-end whitespace-pre-wrap break-word'>
+                                        <div>
+                                            {props.data.message} 
+                                        </div>
+                                        {
+                                            props.data.readTime == null ?
+                                            <BiCheck size={15} color={'rgb(107 114 128)'} className='ml-2' />
+                                            :
+                                            <BiCheckDouble size={15} color={'rgb(107 114 128)'} className='ml-2' />
+                                        }
                                     </div>
                                 </div>
                                 {
@@ -271,10 +286,10 @@ function UserMessage(props:any) {
                         </div>
                         <div onMouseOver={() => setMore(true)} onMouseOut={() => setMore(false)} className='flex items-end hover:cursor-pointer'>
                             {
-                                more && props.data.staff?.id == user.id ?
+                                more && props.data.staff?.id == props.user.id ?
                                 <Popup trigger={
                                     <div>
-                                        <RiMoreFill color='rgb(156 163 175)' size={20} className='mr-1.5'/>
+                                        <RiMoreFill color='rgb(107 114 128)' size={20} className='mr-1.5'/>
                                     </div>
                                 } position="bottom left"
                                 closeOnDocumentClick>
@@ -335,8 +350,10 @@ function UserMessage(props:any) {
                                     {props.data.user?.name}
                                 </div>
                                 <div onMouseOver={() => setMore(true)} onMouseOut={() => setMore(false)} className='flex items-end hover:cursor-pointer'>
-                                    <div className='bg-gray-200 max-w-2xl py-1.5 px-2 rounded-lg text-smalltext'>
-                                        {props.data.message} 
+                                    <div className='bg-gray-200 max-w-2xl py-1.5 px-2 rounded-lg text-smalltext flex justify-between items-end whitespace-pre-wrap break-word'>
+                                        <div>
+                                            {props.data.message} 
+                                        </div>
                                     </div>
                                 </div>
                                 <div className='max-w-2xl py-1.5 text-xtinytext text-gray-400'>
@@ -363,8 +380,10 @@ function UserMessage(props:any) {
                                     {props.data.user?.name} 
                                 </div>
                                 <div onMouseOver={() => setMore(true)} onMouseOut={() => setMore(false)} className='flex items-end hover:cursor-pointer'>
-                                    <div className='bg-gray-200 max-w-2xl py-1.5 px-2 rounded-lg text-smalltext'>
-                                        {props.data.message}
+                                    <div className='bg-gray-200 max-w-2xl py-1.5 px-2 rounded-lg text-smalltext flex justify-between items-end whitespace-pre-wrap break-word'>
+                                        <div>
+                                            {props.data.message} 
+                                        </div>
                                     </div>
                                 </div>
                                 {
@@ -397,8 +416,10 @@ function UserMessage(props:any) {
                                     </div> : <></>
                                 }
                                 <div onMouseOver={() => setMore(true)} onMouseOut={() => setMore(false)} className='flex items-end hover:cursor-pointer'>
-                                    <div className='bg-gray-200 max-w-2xl py-1.5 px-2 rounded-lg text-smalltext'>
-                                        {props.data.message} 
+                                    <div className='bg-gray-200 max-w-2xl py-1.5 px-2 rounded-lg text-smalltext flex justify-between items-end whitespace-pre-wrap break-word'>
+                                        <div>
+                                            {props.data.message} 
+                                        </div>
                                     </div>
                                 </div>
                                 <div className='max-w-2xl py-1.5 text-xtinytext text-gray-400'>
@@ -428,8 +449,10 @@ function UserMessage(props:any) {
                                     </div> : <></>
                                 }
                                 <div onMouseOver={() => setMore(true)} onMouseOut={() => setMore(false)} className='flex items-end hover:cursor-pointer'>
-                                    <div className='bg-gray-200 max-w-2xl py-1.5 px-2 rounded-lg text-smalltext'>
-                                        {props.data.message} 
+                                    <div className='bg-gray-200 max-w-2xl py-1.5 px-2 rounded-lg text-smalltext flex justify-between items-end whitespace-pre-wrap break-word'>
+                                        <div>
+                                            {props.data.message} 
+                                        </div>
                                     </div>
                                 </div>
                                 {
@@ -482,7 +505,7 @@ function UserMessage(props:any) {
                                     more ? 
                                     <Popup trigger={
                                         <div>
-                                            <RiMoreFill color='rgb(156 163 175)' size={20} className='mr-1.5'/>
+                                            <RiMoreFill color='rgb(107 114 128)' size={20} className='mr-1.5'/>
                                         </div>
                                     } position="bottom left"
                                     closeOnDocumentClick>
