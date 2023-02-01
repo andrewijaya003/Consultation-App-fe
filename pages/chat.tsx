@@ -136,6 +136,7 @@ function chat() {
     }, [rooms])
 
     function changeHeader(message:any) {
+        console.log('ini change')
         if(rooms != undefined) {
             if(message[0]?.file != null) {
                 rooms.map((room:any) => {
@@ -155,9 +156,11 @@ function chat() {
     }
 
     function readHeader(roomId:string) {
+        console.log('ini header')
         if(rooms != undefined) {
             rooms.map((room:any) => {
-                if(room.lastChat.roomId == roomId) {
+                if(room.lastChat.roomId == roomId && room.lastChat.staff == null) {
+                    console.log(room.lastChat)
                     room.lastChat.readTime = new Date()
                 }
             })
@@ -409,10 +412,6 @@ function chat() {
         socket.emit('read-all-message', header.lastRoomChatId)
         readHeader(header.lastRoomChatId)
     }
-
-    useEffect(() => {
-        console.log(rooms)
-    }, [rooms])
 
     return (
         <div className='max-w-screen-xl w-full px-4 py-5 flex flex-col ml-auto mr-auto'>

@@ -260,6 +260,7 @@ function UserChat(props:any) {
     }
 
     function appendNewChat(data:any) {
+        console.log('ini append')
         if(rooms != undefined){
             if(data[0]?.file != null) {
                 if(rooms[0].chats[0] != undefined) {
@@ -411,8 +412,11 @@ function UserChat(props:any) {
                             room.chats.map((chat:any, index:BigInteger, arr:any) => (
                                 <StaffMessage socketUnsend={socketUnsend} key={index} data={chat} before={arr[index+1]} after={arr[index-1]} index={index} user={user} />
                             )).concat(room.categories.map((category:any) => (
-                                <div id={room.id} className='mx-4 py-1 mt-3 rounded-lg text-tinytext text-white flex justify-center bg-blue hover:cursor-pointer' onClick={() => endRoomChatPopupHandler(room)}>
+                                <div id={room.id} className={`mx-4 py-1 mt-3 rounded-lg text-smalltext text-white flex justify-center ${room.status == 'Closed' ? 'bg-red' : room.status == 'Done' ? 'bg-[#83d475]' : 'bg-yellow'} hover:cursor-pointer relative`} onClick={() => endRoomChatPopupHandler(room)}>
                                     {category.category}
+                                    <div className='absolute left-2'>
+                                        <BsInfoCircle size={20} />
+                                    </div>
                                 </div>
                             )))
                         ))

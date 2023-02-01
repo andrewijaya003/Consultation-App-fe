@@ -69,18 +69,18 @@ function UserChat(props:any) {
         if(chats == undefined) return
 
         socket.on('user-read-all-message', ((data:any) => {
-            console.log(data)
             fetch(process.env.BASE_URL+'/chat/read-all-chat/'+data.data, {
                 headers: {
                     'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
                     'Content-type': 'application/json'
                 },
                 method: 'PUT',
-            }).then(res => res.json()).then((data) => console.log(data))
+            }).then(res => res.json())
 
             if(chats != undefined) {
                 chats.map((chat:any) => {
                     if(chat.readTime == null && chat.user != null) {
+                        console.log('ini chat user')
                         chat.readTime = new Date()
                     }
                 })
@@ -287,7 +287,7 @@ function UserChat(props:any) {
         }
         if(e.key == 'Enter' && !shift && message.trim() != '') {
             let sendChat = new FormData()
-            sendChat.append('roomId', props.roomChatId)
+            sendChat.append('roomId', activeRoom.id)
             sendChat.append('message', message)
 
             const data:any = await fetch(process.env.BASE_URL + '/chat', {

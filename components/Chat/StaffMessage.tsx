@@ -306,19 +306,35 @@ function UserMessage(props:any) {
                             }
                             {
                                 props.data.file?.type.match('image.*') ? 
-                                <img src={process.env.BASE_URL+'/'+props.data.file?.id} alt="" className='max-w-xs rounded-lg text-smalltext' />
+                                <div className='flex items-end'>
+                                    <img src={process.env.BASE_URL+'/'+props.data.file?.id} alt="" className='max-w-xs rounded-lg text-smalltext' />
+                                    {
+                                        props.data.readTime == null ?
+                                        <BiCheck size={15} color={'rgb(107 114 128)'} className='ml-2' />
+                                        :
+                                        <BiCheckDouble size={15} color={'rgb(107 114 128)'} className='ml-2' />
+                                    }
+                                </div>
                                 :
                                 <div className='flex justify-start items-center bg-[#c7eafe] max-w-2xl py-1.5 px-2 rounded-lg text-smalltext'>
                                     <div className='mr-3 object-contain flex justify-center'>
                                         <AiOutlineFolder size={50} color='#222222' />
                                     </div>
-                                    <div className='flex flex-col'>
-                                        <div className='text-smalltext'>
-                                            {props.data.file?.name}
+                                    <div className='flex items-end'>
+                                        <div className='flex flex-col'>
+                                            <div className='text-smalltext'>
+                                                {props.data.file?.name}
+                                            </div>
+                                            <div className='text-tinytext text-gray-500 mt-0.5'>
+                                                {(props.data.file?.fileSize/1024).toFixed(0)+'KB'}
+                                            </div>
                                         </div>
-                                        <div className='text-tinytext text-gray-500 mt-0.5'>
-                                            222KB
-                                        </div>
+                                        {
+                                            props.data.readTime == null ?
+                                            <BiCheck size={15} color={'rgb(107 114 128)'} className='ml-2' />
+                                            :
+                                            <BiCheckDouble size={15} color={'rgb(107 114 128)'} className='ml-2' />
+                                        }
                                     </div>
                                 </div>
                             }
@@ -485,19 +501,35 @@ function UserMessage(props:any) {
                             <div onMouseOver={() => setMore(true)} onMouseOut={() => setMore(false)} className='flex items-end hover:cursor-pointer'>
                                 {
                                     props.data.file?.type.match('image.*') ? 
-                                    <img src={process.env.BASE_URL+'/'+props.data.file?.id} alt="" className='max-w-xs rounded-lg text-smalltext' />
+                                    <div className='flex items-end'>
+                                        <img src={process.env.BASE_URL+'/'+props.data.file?.id} alt="" className='max-w-xs rounded-lg text-smalltext' />
+                                        {
+                                            props.data.readTime == null ?
+                                            <BiCheck size={15} color={'rgb(107 114 128)'} className='ml-2' />
+                                            :
+                                            <BiCheckDouble size={15} color={'rgb(107 114 128)'} className='ml-2' />
+                                        }
+                                    </div>
                                     :
                                     <div className='flex justify-start items-center bg-gray-200 max-w-2xl py-1.5 px-2 rounded-lg text-smalltext'>
                                         <div className='mr-3 object-contain flex justify-center'>
                                             <AiOutlineFolder size={50} color='#222222' />
                                         </div>
-                                        <div className='flex flex-col'>
-                                            <div className='text-smalltext'>
-                                                {props.data.file?.name}
+                                        <div className='flex items-end'>
+                                            <div className='flex flex-col'>
+                                                <div className='text-smalltext'>
+                                                    {props.data.file?.name}
+                                                </div>
+                                                <div className='text-tinytext text-gray-500 mt-0.5'>
+                                                    {(props.data.file?.fileSize/1024).toFixed(0)+'KB'}
+                                                </div>
                                             </div>
-                                            <div className='text-tinytext text-gray-500 mt-0.5'>
-                                                222KB
-                                            </div>
+                                            {
+                                                props.data.readTime == null ?
+                                                <BiCheck size={15} color={'rgb(107 114 128)'} className='ml-2' />
+                                                :
+                                                <BiCheckDouble size={15} color={'rgb(107 114 128)'} className='ml-2' />
+                                            }
                                         </div>
                                     </div>
                                 }

@@ -27,7 +27,7 @@ function HeaderChat(props:any) {
             </div>
             <div className='flex w-full flex-col items-end'>
                 {
-                    props.header.lastChat.readTime == null ?
+                    props.header.lastChat.readTime == null && props.header.lastChat.staff == null ?
                     <div className='rounded-full bg-blue w-2.5 h-2.5 mb-1.5'/>
                     :
                     <div className='rounded-full bg-transparent w-2.5 h-2.5 mb-1.5' />
