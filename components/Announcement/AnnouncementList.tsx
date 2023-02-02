@@ -87,7 +87,7 @@ function AnnouncementList(props:any) {
                                 {
                                     getCookie('ROLE') === 'STAFF' ?
                                     <div className='text-end text-tinytext text-gray-400 mt-4'>
-                                        Updated by on { moment(announcement.lastUpdatedTime).format('DD MMMM YYYY') }
+                                        Updated by {announcement.updatedByStaff.name} on { moment(announcement.lastUpdatedTime).format('DD MMMM YYYY') }
                                     </div> : <></>
                                 }
                                 {

@@ -54,13 +54,13 @@ function MeetingList(props:any) {
                                 <div className='text-smalltext font-bold'>
                                     PIC:
                                 </div>
-                                <div className='text-justify text-smalltext whitespace-pre-wrap break-word mb-2'>
+                                <div className='text-justify text-smalltext whitespace-pre-wrap break-word mb-0.5'>
                                     { meeting.staff.name }
                                 </div>
                                 <div className='text-smalltext font-bold'>
                                     Time:
                                 </div>
-                                <div className='text-justify text-smalltext whitespace-pre-wrap break-word mb-2'>
+                                <div className='text-justify text-smalltext whitespace-pre-wrap break-word mb-0.5'>
                                     { moment(meeting.startTime).format('DD MMMM YYYY') } || { moment(meeting.startTime).format('hh:mm A') }
                                 </div>
                                 <div className='text-smalltext font-bold'>
@@ -73,7 +73,7 @@ function MeetingList(props:any) {
                                 <div className='text-smalltext font-bold'>
                                     Notes for user:
                                 </div>
-                                <div className='text-justify text-smalltext whitespace-pre-wrap break-word mb-2'>
+                                <div className='text-justify text-smalltext whitespace-pre-wrap break-word mb-0.5'>
                                     { meeting.description }
                                 </div>
                                 {

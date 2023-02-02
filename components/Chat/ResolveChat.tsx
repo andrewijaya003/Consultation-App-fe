@@ -95,7 +95,7 @@ function ResolveChat(props:any) {
         props.resolve ?
         <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-popupbg z-20' onClick={props.onClose}>
             <div className='sm:max-w-screen-sm lg:max-w-screen-xm w-full px-4 py-5 flex flex-col ml-auto mr-auto text-secblack bg-white rounded-md' onClick={(e) => e.stopPropagation()}>
-                <PageTitle2 title='Resolve Room Chat' sectitle='Chat' />
+                <PageTitle2 title='End Room Chat' sectitle='Chat' />
                 <form className='flex flex-col mt-6'>
                     <div className='flex flex-col mb-6'>
                         <label htmlFor='problem' className='text-smalltext flex whitespace-pre-wrap break-all font-semibold text-gray-700 mb-1'>
@@ -146,7 +146,7 @@ function ResolveChat(props:any) {
                         errorMsg !== '' ? <AlertError title={errorMsg} onClose={() => setErrorMsg('')} /> : <></>
                     }
                     <div className='flex justify-end mt-2'>
-                        <input type="button" value='Resolve' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' onClick={resolveHandler} />
+                        <input type="button" value='End' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' onClick={resolveHandler} />
                     </div>
                 </form>
             </div>

@@ -462,7 +462,7 @@ function UserChat(props:any) {
                                 This chat has been closed. Please input rating if you want contact us again.
                             </div>
                             <div className='rounded bg-blue text-white p-2 hover:cursor-pointer font-bold' onClick={() => setAdd(true)}>
-                                Input rating
+                                Insert rating
                             </div>
                         </div>
                     }
