@@ -89,12 +89,12 @@ function MeetingList(props:any) {
                                                 </div>
                                             </div>
                                             <div className='text-justify text-smalltext whitespace-pre-wrap break-word text-blue font-bold'>
-                                                Press edit button to edit notes
+                                                Press update button to update notes
                                             </div>
                                         </>
                                         :
                                         <div className='text-justify text-smalltext whitespace-pre-wrap break-word text-blue font-bold'>
-                                            Press edit button to input notes
+                                            Press update button to insert notes
                                         </div>
                                     : <></>
                                 }
