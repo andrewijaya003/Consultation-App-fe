@@ -56,7 +56,7 @@ function Home() {
                     {
                         getCookie('ROLE') === 'STAFF' ? 
                         <div className='flex justify-end' onClick={() => setAdd(true)}>
-                            <input type="submit" value='Add New Announcement' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' />
+                            <input type="submit" value='Insert Announcement' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' />
                         </div> : <></>
                     }
                 </div>

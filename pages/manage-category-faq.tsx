@@ -80,7 +80,7 @@ function ManageCategory(props:any) {
                             <div className='h-0.5 bg-secblack my-2'></div>
                         </div>
                         <div className='flex justify-end' onClick={addHandler}>
-                            <input type="submit" value='Add New Category' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' />
+                            <input type="submit" value='Insert Category' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' />
                         </div>
                     </div>
                     <div className="max-w-sm mt-3">

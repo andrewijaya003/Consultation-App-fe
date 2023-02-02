@@ -159,6 +159,10 @@ function ManageMeeting() {
         }
     }, [])
 
+    useEffect(() => {
+        console.log(data)
+    }, [data])
+
     return (
         <div className='max-w-screen-xl w-full px-4 py-5 flex flex-col ml-auto mr-auto'>
             {/* PageTitle Start */}
@@ -173,7 +177,7 @@ function ManageMeeting() {
                     {
                         getCookie('ROLE') === 'STAFF' ? 
                         <div className='flex justify-end' onClick={addHandler}>
-                            <input type="submit" value='Add New Meeting' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' />
+                            <input type="submit" value='Insert Meeting' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' />
                         </div> : <></>
                     }
                 </div>

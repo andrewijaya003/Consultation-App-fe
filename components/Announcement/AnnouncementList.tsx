@@ -95,7 +95,7 @@ function AnnouncementList(props:any) {
                                     <div className="text-end text-smalltext font-bold flex w-full justify-end mt-2">
                                         <div className='flex py-2 px-4 rounded bg-yellow items-center text-white mr-3 hover:cursor-pointer' onClick={() => editHandler(announcement)}>
                                             <FiEdit2 className='text-smalltitle mr-1.5' />
-                                            Edit
+                                            Update
                                         </div>
                                         <div className='flex py-2 px-4 rounded bg-red items-center text-white hover:cursor-pointer' onClick={() => deleteHandler(announcement)}>
                                             <RiDeleteBinLine className='text-smalltitle mr-1.5' />

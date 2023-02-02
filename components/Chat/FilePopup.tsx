@@ -11,6 +11,9 @@ function FilePopup(props:any) {
     async function sendFilesHandler() {
         let sendFiles = new FormData()
         for(let i = 0; i < props.files.length; i++) {
+            if(props.files[i].size > 50000) {
+                continue
+            }
             sendFiles.append('files', props.files[i])
         }
         sendFiles.append('roomId', props.roomChatId)
@@ -43,7 +46,7 @@ function FilePopup(props:any) {
                     </div>
                     <ImCross size={12} color='rgb(156 163 175)' className='hover:cursor-pointer' onClick={props.onClose} />
                 </div>
-                <div className='files-container w-full display-scrollbar'>
+                <div className='files-container w-full h-[200px] my-2 display-scrollbar'>
                     {
                         props.fixFiles.map((src, index) => (
                             <CardFiles src={src} fileName={props.files[index].name} fileSize={props.files[index].size} fileExt={props.files[index].type} />

@@ -99,7 +99,7 @@ function FAQList(props:any) {
                                         <div className="flex text-end w-full mt-2 text-smalltext font-bold ">
                                             <div className='flex py-2 px-4 rounded bg-yellow items-center text-white mr-3 hover:cursor-pointer' onClick={() => editHandler(faq)}>
                                                 <FiEdit2 className='text-smalltitle mr-1.5' />
-                                                Edit
+                                                Update
                                             </div>
                                             <div className='flex py-2 px-4 rounded bg-red items-center text-white hover:cursor-pointer' onClick={() => deleteHandler(faq)}>
                                                 <RiDeleteBinLine className='text-smalltitle mr-1.5' />

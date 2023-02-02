@@ -64,7 +64,7 @@ function CategoryList(props:any) {
                                         <div className='h-0.5 bg-secblack my-1'></div>
                                     </div>
                                     <div className='flex justify-end' onClick={() => addHandler(category)}>
-                                        <input type="button" value='Add New FAQ' className='bg-blue text-white text-smalltext font-semibold rounded px-4 py-1.5 hover:cursor-pointer' />
+                                        <input type="button" value='Insert FAQ' className='bg-blue text-white text-smalltext font-semibold rounded px-4 py-1.5 hover:cursor-pointer' />
                                     </div>
                                 </div>
                                 <FAQList categoryId={category.id} />
@@ -74,7 +74,7 @@ function CategoryList(props:any) {
                                 <div className="text-end text-smalltext font-bold flex w-full justify-end mt-2">
                                     <div className='flex py-2 px-4 rounded bg-yellow items-center text-white mr-3 hover:cursor-pointer' onClick={() => editHandler(category)}>
                                         <FiEdit2 className='text-smalltitle mr-1.5' />
-                                        Edit
+                                        Update
                                     </div>
                                     <div className='flex py-2 px-4 rounded bg-red items-center text-white hover:cursor-pointer' onClick={() => deleteHandler(category)}>
                                         <RiDeleteBinLine className='text-smalltitle mr-1.5' />

@@ -200,6 +200,12 @@ function meeting() {
                                     </div>
                                 </div>
                                 <div className='text-smalltext font-bold'>
+                                    PIC:
+                                </div>
+                                <div className='text-justify text-smalltext whitespace-pre-wrap break-word mb-2'>
+                                    { meeting.staff.name }
+                                </div>
+                                <div className='text-smalltext font-bold'>
                                     Time:
                                 </div>
                                 <div className='text-justify text-smalltext whitespace-pre-wrap break-word mb-2'>
@@ -212,7 +218,7 @@ function meeting() {
                                     {meeting.location}
                                 </div>
                                 <div className='text-smalltext font-bold'>
-                                    Notes for student:
+                                    Notes for user:
                                 </div>
                                 <div className='text-justify text-smalltext whitespace-pre-wrap break-word mb-2'>
                                     { meeting.description }
