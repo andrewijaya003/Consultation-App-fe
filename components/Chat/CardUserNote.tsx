@@ -89,7 +89,7 @@ function CardUserNote(props:any) {
                                 </div>
                                 {
                                     popupDelete ?
-                                    <div className={`absolute -bottom-100 -right-100 z-30 w-fit text-smalltext font-bold px-3 py-2 bg-white border border-gray-300 shadow-sm rounded-md`}>
+                                    <div className={`absolute -bottom-100 right-0 z-30 w-fit text-smalltext font-bold px-3 py-2 bg-white border border-gray-300 shadow-sm rounded-md`}>
                                         <div className='px-3 py-2 w-full' >
                                             Are you sure want to delete this user note?
                                         </div>
