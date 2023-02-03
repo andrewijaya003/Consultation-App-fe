@@ -93,7 +93,7 @@ function chat() {
                     })
                 }
                 setRooms([...rooms])
-                resetHeaderChat()
+                // resetHeaderChat()
             }
         }))
 
