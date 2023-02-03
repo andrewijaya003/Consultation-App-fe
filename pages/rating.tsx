@@ -177,6 +177,8 @@ function rating() {
 
     useEffect(() => {
         ratingMutate()
+        detailRatingaMutate()
+        countStatusaMutate()
     }, [bounceYear])
 
     useEffect(() => {
