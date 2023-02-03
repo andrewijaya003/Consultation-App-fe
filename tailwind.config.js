@@ -43,6 +43,7 @@ module.exports = {
 				red: "#ea6664",
 				yellow: "#ffc549",
 				popupbg: 'rgba(0, 0, 0, 0.7)',
+				popupbg2: 'rgba(0, 0, 0, 0.2)',
 				brkwhite: '#fafafa',
 				pink: '#fef2f2',
 				redblack: '#a12f4b'

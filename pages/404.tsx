@@ -1,21 +1,20 @@
-import React, { useEffect, useState } from "react";
-import LoginForm from "../components/LoginForm";
+import React from 'react'
 import { useCallback } from "react";
 import type { Container, Engine } from "tsparticles-engine";
 import Particles from "react-tsparticles";
 import { loadFull } from "tsparticles";
 
-function LoginPage() {
-	const particlesInit = useCallback(async (engine: Engine) => {
+function notFound() {
+    const particlesInit = useCallback(async (engine: Engine) => {
         await loadFull(engine);
     }, []);
 
     const particlesLoaded = useCallback(async (container: Container | undefined) => {
     }, []);
 
-	return (
-		<>
-			<Particles
+    return (
+        <>
+            <Particles
 				id="tsparticles"
 				init={particlesInit}
 				loaded={particlesLoaded}
@@ -92,29 +91,24 @@ function LoginPage() {
 					"detectRetina": true
 				}}
 			/>
-		
-			<div className="w-screen h-screen flex justify-center items-center move-bg">
-				<div className="flex items-center z-10">
-					<div className="sm:hidden lg:flex flex-col justify-center items-end w-550 text-end mr-16">
-						<div className="text-white font-mont text-normal">
-							Nice to see you again
-						</div>
-						<div className="text-white font-mont text-bigtitle font-bold pb-2 border-white border-b-4 mb-5">
-							CONSULTATION APP
-						</div>
-						<div className="text-white font-mont text-normal">
-							This application is made to help enrichment actors (students and
-							supervisors). With this application, enrichment actors can directly
-							chat with the enrichment admin to explain the problem about their
-							enrichment program, then the enrichment admin will provide a
-							solution to the problem.
-						</div>
-					</div>
-					<LoginForm />
-				</div>
+
+            <div className="w-screen h-screen flex flex-col justify-center items-center move-bg">
+                <div className=' text-center text-white font-bold border-white border-b-4'>
+                    <p className='text-[100px]'>
+                        404
+                    </p>
+                    <p className='text-[30px]'>
+                        YOU SEEM TO BE LOST!
+                    </p>
+                </div>
+                <div className='text-white font-mont text-center text-normal mt-5 whitespace-pre-wrap break-word'>
+                    The page you're looking for isn't available.
+                    <br/>
+                    Try searching again or back to previous page.
+                </div>
 			</div> 
-		</>
-	);
+        </>
+    )
 }
 
-export default LoginPage;
+export default notFound

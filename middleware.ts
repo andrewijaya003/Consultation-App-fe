@@ -37,9 +37,9 @@ export async function middleware(request:NextRequest) {
         return response;
     }
 
-    if(pathname != '/' && token == undefined) {
+    if(pathname != '/' && pathname != '/LoginAD' && token == undefined) {
         request.nextUrl.pathname = '/'
-    } else if(pathname == '/' && token != undefined) {
+    } else if((pathname == '/' || pathname == '/LoginAD') &&  token != undefined) {
         request.nextUrl.pathname = '/home'
     } else if(request.cookies.get('ROLE') !== 'STAFF' && (pathname == '/chat' || pathname == '/rating' || pathname == 'manage-category-faq')) {
         request.nextUrl.pathname = '/404'

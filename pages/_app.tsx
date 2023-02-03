@@ -26,10 +26,10 @@ function MyApp({ Component, pageProps }: AppProps) {
         // <SWRConfig value={{dedupingInterval: 1000}}>
         <MsalProvider instance={msalInstance}>
             <div className='font-mont bg-white text-secblack'>
-                { router.pathname === '/' ? <></> : <Header /> }
-                { router.pathname === '/' ? <></> : <Navbar /> }
+                { router.pathname === '/' || router.pathname === '/LoginAD' || router.pathname === '/404' ? <></> : <Header /> }
+                { router.pathname === '/' || router.pathname === '/LoginAD' || router.pathname === '/404' ? <></> : <Navbar /> }
                 <Component {...pageProps} />
-                { router.pathname === '/' ? <></> : <Footer /> }
+                { router.pathname === '/' || router.pathname === '/LoginAD' || router.pathname === '/404' ? <></> : <Footer /> }
             </div>
         </MsalProvider>
         // </SWRConfig>
