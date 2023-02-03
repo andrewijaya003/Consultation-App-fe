@@ -244,7 +244,7 @@ function rating() {
                                     Closed
                                 </div>
                                 <div className='font-bold text-normaltitle'>
-                                    {countStatus?.canceled}
+                                    {countStatus?.closed}
                                 </div>
                             </div>
                             <div className='flex flex-col rounded-lg px-3.5 py-3 bg-yellow text-white'>
