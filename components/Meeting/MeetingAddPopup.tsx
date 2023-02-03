@@ -79,7 +79,7 @@ function MeetingAddPopup(props:any) {
         <div className='fixed top-0 left-0 w-full h-full max-h-screen flex justify-center items-center bg-popupbg z-20' onClick={props.onClose}>
             <div className='sm:max-w-screen-sm lg:max-w-screen-xm w-full py-5 flex flex-col ml-auto mr-auto text-secblack bg-white rounded-md ' onClick={(e) => e.stopPropagation()}>
                 <div className='px-4'>
-                    <PageTitle2 title='New Meeting' sectitle='meeting' />
+                    <PageTitle2 title='Insert Meeting' sectitle='meeting' />
                 </div>
                 <form className='flex flex-col mt-6 max-h-[420px] display-scrollbar px-4'>
                     <div className='flex flex-col mb-6'>
@@ -137,12 +137,11 @@ function MeetingAddPopup(props:any) {
                             </div>
                         </div>
                     </div>
-                    <div className='h-px bg-secblack my-2' />
                     {
                         errorMsg !== '' ? <AlertError title={errorMsg} onClose={() => setErrorMsg('')} /> : <></>
                     }
-                    <div className='flex justify-end mt-2'>
-                        <input type="button" value='Create' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' onClick={addMeetingHandler} />
+                    <div className='flex justify-end mt-2 border-t-2 border-secblack'>
+                        <input type="button" value='Insert' className='bg-blue mt-2 text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' onClick={addMeetingHandler} />
                     </div>
                 </form>
             </div>

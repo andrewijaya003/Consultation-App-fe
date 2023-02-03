@@ -53,7 +53,7 @@ function LoginForm() {
                 },
                 method: 'POST',
                 body: JSON.stringify({
-					email: graphData?.mail,
+					email: accounts[0].username,
 					role: window.localStorage.getItem('ROLE') == undefined ? 'STUDENT' : window.localStorage.getItem('ROLE')
 				})
             }).then(

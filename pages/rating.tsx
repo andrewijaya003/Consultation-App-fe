@@ -11,8 +11,8 @@ import DetailRatingList from '../components/Rating/DetailRatingList'
 
 function rating() {
     const [add, setAdd] = useState(false)
-    const [searchYear, setSearchYear] = useState(new Date().getFullYear().toString())
-    const [searchMonth, setSearchMonth] = useState('')
+    const [searchYear, setSearchYear] = useState()
+    const [searchMonth, setSearchMonth] = useState()
     const [range, setRange] = useState<number[]>()
     const [month, setMonth] = useState(new Date().getMonth())
     const [year, setYear] = useState(new Date().getFullYear())
@@ -124,11 +124,12 @@ function rating() {
 
     function searchHandlerMonth(value:string){
         setSearchMonth(value)
+        setShowDP(!showDP)
     }
 
     useEffect(() => {
         if(searchYear == undefined || searchYear == null || searchYear == '') {
-            setYear(2023)
+            setYear(new Date().getFullYear())
         } else {
             setYear(parseInt(searchYear))
         }
@@ -136,7 +137,7 @@ function rating() {
 
     useEffect(() => {
         if(searchMonth == undefined || searchMonth == null || searchMonth == '') {
-            setMonth(1)
+            setMonth(new Date().getMonth())
         } else {
             if(searchMonth.toLocaleLowerCase() == 'january') {
                 setMonth(1)
@@ -165,6 +166,14 @@ function rating() {
             }
         }
     }, [searchMonth])
+
+    useEffect(() => {
+        console.log(month)
+    }, [month])
+
+    useEffect(() => {
+        console.log(year)
+    }, [year])
 
     useEffect(() => {
         ratingMutate()

@@ -39,7 +39,7 @@ function UserMessage(props:any) {
     }
     
     return (
-        props.data.user?.id == props.user.id ?
+        props.data.user?.id == props.user.id || props.data.userId == props.user.id  ?
             props.data.message != null ? 
                 // user tidak ada before dan tidak ada after
                 moment(props.before?.time).format('hh:mm A') != moment(props.data.time).format('hh:mm A') && moment(props.after?.time).format('hh:mm A') != moment(props.data.time).format('hh:mm A') ?
@@ -306,19 +306,35 @@ function UserMessage(props:any) {
                             }
                             {
                                 props.data.file?.type.match('image.*') ? 
-                                <img src={process.env.BASE_URL+'/'+props.data.file?.id} alt="" className='max-w-xs rounded-lg text-smalltext' />
+                                <div className='flex items-end'>
+                                    <img src={process.env.BASE_URL+'/'+props.data.file?.id} alt="" className='max-w-xs rounded-lg text-smalltext' />
+                                    {
+                                        props.data.readTime == null ?
+                                        <BiCheck size={15} color={'rgb(107 114 128)'} className='ml-2' />
+                                        :
+                                        <BiCheckDouble size={15} color={'rgb(107 114 128)'} className='ml-2' />
+                                    }
+                                </div>
                                 :
                                 <div className='flex justify-start items-center bg-[#c7eafe] max-w-2xl py-1.5 px-2 rounded-lg text-smalltext'>
                                     <div className='mr-3 object-contain flex justify-center'>
                                         <AiOutlineFolder size={50} color='#222222' />
                                     </div>
-                                    <div className='flex flex-col'>
-                                        <div className='text-smalltext'>
-                                            {props.data.file?.name}
+                                    <div className='flex items-end'>
+                                        <div className='flex flex-col'>
+                                            <div className='text-smalltext'>
+                                                {props.data.file?.name}
+                                            </div>
+                                            <div className='text-tinytext text-gray-500 mt-0.5'>
+                                                {(props.data.file?.fileSize/1024).toFixed(0)+'KB'}
+                                            </div>
                                         </div>
-                                        <div className='text-tinytext text-gray-500 mt-0.5'>
-                                            222KB
-                                        </div>
+                                        {
+                                            props.data.readTime == null ?
+                                            <BiCheck size={15} color={'rgb(107 114 128)'} className='ml-2' />
+                                            :
+                                            <BiCheckDouble size={15} color={'rgb(107 114 128)'} className='ml-2' />
+                                        }
                                     </div>
                                 </div>
                             }
@@ -493,6 +509,22 @@ function UserMessage(props:any) {
                                             </div>
                                         </div>
                                     </div>
+                                }
+                                {
+                                    more ? 
+                                    <Popup trigger={
+                                        <div>
+                                            <RiMoreFill color='rgb(107 114 128)' size={20} className='ml-1.5'/>
+                                        </div>
+                                    } position="bottom left"
+                                    closeOnDocumentClick>
+                                        <div className={`flex flex-col w-full mt-2 border border-gray-300 shadow-sm rounded-md hover:cursor-pointer bg-white`}>
+                                            <div className='hover:bg-gray-100 px-3 py-2' onClick={() => downloadUsingFetch(props.data.file?.id, props.data.file?.name)} >
+                                                Download
+                                            </div>
+                                        </div>
+                                    </Popup>
+                                    : <></>
                                 }
                             </div>
                             <div className='max-w-2xl py-1.5 text-xtinytext text-gray-400'>

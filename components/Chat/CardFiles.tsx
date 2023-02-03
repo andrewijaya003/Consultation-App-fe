@@ -7,7 +7,11 @@ function CardFiles(props:any) {
     const [errorMsg, setErrorMsg] = useState('')
 
     useEffect(() => {
-        if(props.fileSize > 50000) {
+        console.log(props.src)
+    }, [props.src])
+
+    useEffect(() => {
+        if(props.fileSize > 10000000) {
             setErrorMsg(props.fileName + ' to large')
         } else {
             setErrorMsg('')
@@ -15,13 +19,13 @@ function CardFiles(props:any) {
     }, [props.fileSize])
 
     return (
-        props.fileSize < 50000 ? 
+        props.fileSize < 10000000 ? 
         <div className='w-full flex justify-start items-center p-3.5'>
             <div className='flex w-full justify-between'>
                 <div className='flex justify-start items-center'>
                     {
                         props.fileExt.match('image.*') ? 
-                        <img src={props.src} alt="" className='w-16 h-16 mr-3 object-contain' />
+                        <img src={URL.createObjectURL(props.src)} alt="" className='w-16 h-16 mr-3 object-contain' />
                         :
                         <div className='w-16 h-16 mr-3 object-contain flex justify-center'>
                             <AiOutlineFolder size={50} color='#222222' />

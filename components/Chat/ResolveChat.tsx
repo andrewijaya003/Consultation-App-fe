@@ -91,12 +91,19 @@ function ResolveChat(props:any) {
         }
     }
 
+    function statusHandler(str:string) {
+        setStatus(str)
+        setShowDP(!showDP)
+    }
+
     return (
         props.resolve ?
         <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-popupbg z-20' onClick={props.onClose}>
-            <div className='sm:max-w-screen-sm lg:max-w-screen-xm w-full px-4 py-5 flex flex-col ml-auto mr-auto text-secblack bg-white rounded-md' onClick={(e) => e.stopPropagation()}>
-                <PageTitle2 title='End Room Chat' sectitle='Chat' />
-                <form className='flex flex-col mt-6'>
+            <div className='sm:max-w-screen-sm lg:max-w-screen-xm w-full py-5 flex flex-col ml-auto mr-auto text-secblack bg-white rounded-md' onClick={(e) => e.stopPropagation()}>
+                <div className='px-4'>
+                    <PageTitle2 title='End Room Chat' sectitle='room chat' />
+                </div>
+                <form className='flex flex-col mt-6 max-h-[420px] display-scrollbar px-4'>
                     <div className='flex flex-col mb-6'>
                         <label htmlFor='problem' className='text-smalltext flex whitespace-pre-wrap break-all font-semibold text-gray-700 mb-1'>
                             Problem <div className='text-red'>*</div>
@@ -110,7 +117,7 @@ function ResolveChat(props:any) {
                         <textarea name='solution' id='solution' maxLength={500} rows={8} className='border border-gray-300 rounded-md px-3 py-1.5 outline-0 shadow-sm focus:ring-1 focus:border-blue text-smalltext' required onChange={(e) => setSolution(e.target.value)} />
                     </div>
                     <div className='flex flex-col mb-6'>
-                        <label htmlFor='description' className='text-smalltext flex whitespace-pre-wrap break-all font-semibold text-gray-700 mb-1'>
+                        <label htmlFor='categories' className='text-smalltext flex whitespace-pre-wrap break-all font-semibold text-gray-700 mb-1'>
                             Categories <div className='text-red'>*</div>
                         </label>
                         <MultiSelect
@@ -132,21 +139,20 @@ function ResolveChat(props:any) {
                                 <BiChevronDown size={23} />
                             </div>
                             <div className={`${showDP ? 'absolute' : 'hidden'} w-full mt-2 border border-gray-300 shadow-sm rounded-md hover:cursor-pointer z-2 bg-white`}>
-                                <div className='hover:bg-gray-300 px-3 py-2' onClick={() => setStatus('Closed')}>
+                                <div className='hover:bg-gray-300 px-3 py-2' onClick={() => statusHandler('Closed')}>
                                     Closed
                                 </div>  
-                                <div className='hover:bg-gray-300 px-3 py-2' onClick={() => setStatus('Done')}>
+                                <div className='hover:bg-gray-300 px-3 py-2' onClick={() => statusHandler('Done')}>
                                     Done
                                 </div>  
                             </div>
                         </div>
                     </div>
-                    <div className='h-px bg-secblack my-2' />
                     {
                         errorMsg !== '' ? <AlertError title={errorMsg} onClose={() => setErrorMsg('')} /> : <></>
                     }
-                    <div className='flex justify-end mt-2'>
-                        <input type="button" value='End' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' onClick={resolveHandler} />
+                    <div className='flex justify-end mt-2 border-t-2 border-secblack'>
+                        <input type="button" value='End' className='bg-blue text-white text-normal font-semibold rounded mt-2 px-4 py-1.5 hover:cursor-pointer' onClick={resolveHandler} />
                     </div>
                 </form>
             </div>

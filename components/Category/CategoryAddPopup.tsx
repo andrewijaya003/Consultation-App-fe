@@ -29,7 +29,7 @@ function CategoryAddPopup(props:any) {
                 body: JSON.stringify({
                     category: description
                 })
-            }).then(res => res.json()).then(props.refetch)
+            }).then(res => res.json()).then((data) => props.refetch(data.id))
         }
     }
     
@@ -47,7 +47,6 @@ function CategoryAddPopup(props:any) {
                         </label>
                         <input name='description' id='description' type='text' className='border border-gray-300 rounded-md px-3 py-1.5 outline-0 shadow-sm focus:ring-1 focus:border-blue text-smalltext' required onChange={(e) => setDescription(e.target.value)} /> 
                     </div>
-                    <div className='h-px bg-secblack my-2' />
                     {
                         errorMsg !== '' ? <AlertError title={errorMsg} onClose={() => setErrorMsg('')} /> : <></>
                     }

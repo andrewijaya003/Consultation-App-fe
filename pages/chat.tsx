@@ -54,7 +54,7 @@ function chat() {
     const socket = useMemo<any>(()=>{
         if (!window) return;
 
-        const socket = io('http://localhost:8000')
+        const socket = io(process.env.BASE_URL+"")
 
         return socket;
     }, [window])
@@ -197,7 +197,7 @@ function chat() {
                     })
                 }).then(res => res.json()).then((data) => {
                     setOffsetRooms(takeRooms)
-                    setTakeRooms(takeRooms+1)
+                    setTakeRooms(takeRooms+10)
                     setNewRooms(data)
                 })
                 
@@ -215,7 +215,7 @@ function chat() {
                     })
                 }).then(res => res.json()).then((data) => {
                     setOffsetRooms(takeRooms)
-                    setTakeRooms(takeRooms+1)
+                    setTakeRooms(takeRooms+10)
                     setNewRooms(data)
                 })
             } else if(categoryId != '') {
@@ -232,7 +232,7 @@ function chat() {
                     })
                 }).then(res => res.json()).then((data) => {
                     setOffsetRooms(takeRooms)
-                    setTakeRooms(takeRooms+1)
+                    setTakeRooms(takeRooms+10)
                     setNewRooms(data)
                 })
             } else {
@@ -249,7 +249,7 @@ function chat() {
                     })
                 }).then(res => res.json()).then((data) => {
                     setOffsetRooms(takeRooms)
-                    setTakeRooms(takeRooms+1)
+                    setTakeRooms(takeRooms+10)
                     setNewRooms(data)
                 })
             } 
@@ -324,12 +324,12 @@ function chat() {
             method: 'POST',
             body: JSON.stringify({
                 offset: 0,
-                take: 1
+                take: 10
             })
         }).then(res => res.json()).then(data => {
             setRooms(data)
-            setOffsetRooms(1)
-            setTakeRooms(2)
+            setOffsetRooms(10)
+            setTakeRooms(20)
         })
     }
 
@@ -344,12 +344,12 @@ function chat() {
                 body: JSON.stringify({
                     role: role,
                     offset: 0,
-                    take: 1
+                    take: 10
                 })
             }).then(res => res.json()).then(data => {
                 setRooms(data)
-                setOffsetRooms(1)
-                setTakeRooms(2)
+                setOffsetRooms(10)
+                setTakeRooms(20)
             })
         } else if(categoryId != '') {
             await fetch(process.env.BASE_URL+'/room-chat/preview', {
@@ -361,12 +361,12 @@ function chat() {
                 body: JSON.stringify({
                     categoryId: categoryId,
                     offset: 0,
-                    take: 1
+                    take: 10
                 })
             }).then(res => res.json()).then(data => {
                 setRooms(data)
-                setOffsetRooms(1)
-                setTakeRooms(2)
+                setOffsetRooms(10)
+                setTakeRooms(20)
             })
         } else {
             await fetch(process.env.BASE_URL+'/room-chat/preview', {
@@ -378,12 +378,12 @@ function chat() {
                 body: JSON.stringify({
                     username: username,
                     offset: 0,
-                    take: 1
+                    take: 10
                 })
             }).then(res => res.json()).then(data => {
                 setRooms(data)
-                setOffsetRooms(1)
-                setTakeRooms(2)
+                setOffsetRooms(10)
+                setTakeRooms(20)
             })
         }
     }

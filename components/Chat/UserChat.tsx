@@ -60,7 +60,7 @@ function UserChat(props:any) {
     const socket = useMemo<any>(()=>{
         if (!window) return;
 
-        const socket = io('http://localhost:8000')
+        const socket = io(process.env.BASE_URL+"")
 
         return socket;
     }, [window])
@@ -250,7 +250,8 @@ function UserChat(props:any) {
         if(files.length != 0 ) {
             let list = []
             for(let i = 0; i < files.length; i++) {
-                list.push(URL.createObjectURL(files[i]))
+                // list.push(URL.createObjectURL(files[i]))
+                list.push(files[i])
             }
             setFixFiles(list)
         }
@@ -349,7 +350,7 @@ function UserChat(props:any) {
     }, [indexChat])
 
     useEffect(() => {
-        // console.log(chats)
+        console.log(chats)
     }, [chats])
 
     useEffect(() => {

@@ -104,12 +104,11 @@ function AnnouncementEditPopup(props:any) {
                             labelledBy="Please select role"
                         />
                     </div>
-                    <div className='h-px bg-secblack my-2' />
                     {
                         errorMsg !== '' ? <AlertError title={errorMsg} onClose={() => setErrorMsg('')} /> : <></>
                     }
-                    <div className='flex justify-end mt-2'>
-                        <input type="button" value='Update' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' onClick={editAnnouncementHandler} />
+                    <div className='flex justify-end mt-2 border-t-2 border-secblack'>
+                        <input type="button" value='Update' className='bg-blue text-white text-normal mt-2 font-semibold rounded px-4 py-1.5 hover:cursor-pointer' onClick={editAnnouncementHandler} />
                     </div>
                 </form>
             </div>

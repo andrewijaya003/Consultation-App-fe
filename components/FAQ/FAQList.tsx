@@ -22,12 +22,33 @@ function FAQList(props:any) {
     const [edit, setEdit] = useState(false)
     const [del, setDel] = useState(false)
     const [faq, setFAQ] = useState('')
-    const [endpoint, setEndpoint] = useState(process.env.BASE_URL+'/faq/faq-by-category/'+props.categoryId)
+    // const [data, setData] = useState()
+    const [categoryId, setCategoryId]= useState('')
+    const [endpoint, setEnpoint] = useState(process.env.BASE_URL+'/faq/faq-by-category/'+props.categoryId)
     const {data, mutate} = useSWR(endpoint, fetcher)
 
+    // async function fetchFAQ() {
+    //     await fetch(process.env.BASE_URL+'/faq/faq-by-category/'+categoryId, {
+    //         headers: {
+    //             'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+    //         },
+    //         method: 'GET',
+    //     }).then(res => res.json()).then(d => {
+    //         console.log(d)
+    //         setData(d)
+    //     })
+    // }
+
     useEffect(() => {
-        console.log(data)
-    }, [data])
+        setCategoryId(props.categoryId)
+    }, [props.categoryId])
+
+    useEffect(() => {
+        if(categoryId != '') {
+            setEnpoint(process.env.BASE_URL+'/faq/faq-by-category/'+categoryId)
+            mutate()
+        }
+    }, [categoryId])
 
     function editHandler(faq:any){
         setEdit(true)
@@ -40,26 +61,30 @@ function FAQList(props:any) {
     }
 
     const refetchEdit = async () => {
-        await mutate()
+        mutate()
         setEdit(false)
     }
 
     const refetchDel = async () => {
-        await mutate()
+        mutate()
         setDel(false)
     }
+
+    useEffect(() => {
+        console.log(data)
+    }, [data])
     
     return (
         <>
             <div className='flex flex-col w-full'>
                 {
-                    !data ? 
+                    data == undefined ? 
                     <AlertLoading title='FAQS' />
                     : 
-                        data.length === 0 ? 
+                        data?.length === 0 ? 
                         <AlertNoData title='FAQ' />
                         :
-                        data.map((faq:any) => (
+                        data?.map((faq:any) => (
                             <div className='flex flex-col border border-gray-300 rounded-lg px-3.5 py-3 mb-6 bg-white shadow-xm'>
                                 <div className='flex justify-between w-full'>
                                     <div className='text-smalltext font-bold mb-0.5'>

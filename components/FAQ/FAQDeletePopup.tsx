@@ -24,7 +24,7 @@ function FAQDeletePopup(props:any) {
                 body: JSON.stringify({
                     id: id
                 })
-            }).then(res => res.json()).then(() => router.reload())
+            }).then(res => res.json()).then(() => props.refetch())
         }
 
         

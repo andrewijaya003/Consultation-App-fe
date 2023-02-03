@@ -32,7 +32,7 @@ function CategoryEditPopup(props:any) {
                     id: props.category.id,
                     category: description
                 })
-            }).then(res => res.json()).then(props.refetch)
+            }).then(res => res.json()).then(() => props.refetch(props.category.id))
         }
     }
 
@@ -50,12 +50,11 @@ function CategoryEditPopup(props:any) {
                         </label>
                         <input value={description} name='description' id='description' type='text' className='border border-gray-300 rounded-md px-3 py-1.5 outline-0 shadow-sm focus:ring-1 focus:border-blue text-smalltext' required onChange={(e) => setDescription(e.target.value)} /> 
                     </div>
-                    <div className='h-px bg-secblack my-2' />
                     {
                         errorMsg !== '' ? <AlertError title={errorMsg} onClose={() => setErrorMsg('')} /> : <></>
                     }
-                    <div className='flex justify-end mt-2'>
-                        <input type="button" value='Update' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' onClick={editCategoryHandler} />
+                    <div className='flex justify-end mt-2 border-t-2 border-secblack'>
+                        <input type="button" value='Update' className='bg-blue text-white text-normal mt-2 font-semibold rounded px-4 py-1.5 hover:cursor-pointer' onClick={editCategoryHandler} />
                     </div>
                 </form>
             </div>

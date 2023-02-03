@@ -1,39 +1,59 @@
 import { ImCross } from '@react-icons/all-files/im/ImCross'
 import { getCookie } from 'cookies-next'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import CardFiles from './CardFiles'
 
 function FilePopup(props:any) {
-    useEffect(() => {
-        console.log(props.files)
-    }, [])
+    const [countFile, setCountFile] = useState(0)
+    const [sendFiles, setSendFiles] = useState<FormData>()
 
-    async function sendFilesHandler() {
-        let sendFiles = new FormData()
-        for(let i = 0; i < props.files.length; i++) {
-            if(props.files[i].size > 50000) {
+    useEffect(() => {
+        setCountFile(0)
+        let arr = new FormData()
+        arr.append('roomId', props.roomChatId)
+        for(let i = 0; i < props.fixFiles.length; i++) {
+            if(props.files[i].size > 10000000) {
                 continue
             }
-            sendFiles.append('files', props.files[i])
+            setCountFile(countFile+1)
+            arr.append('files', props.fixFiles[i])
         }
-        sendFiles.append('roomId', props.roomChatId)
+        setSendFiles(arr)
+        console.log(arr)
+    }, [props.fixFiles, props.roomChatId])
 
-        await fetch(process.env.BASE_URL + '/chat/multiple', {
-            headers : { 
-                'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN"),
-            },
-            method: 'POST',
-            body: sendFiles
-        }).then((res) => res.json()).then((data) => {
-            props.socket.emit('message', {message: data})
-            props.appendNewChat(data)
-            if(getCookie('ROLE') == 'STAFF') {
-                props.changeHeader(data)
-            } else {
-                props.socket.emit('notify-all-staff', {message: data})
+    useEffect(() => {
+        if(sendFiles != undefined) {
+            // console.log('fi')
+            for (const value of sendFiles.values()) {
+                console.log(value);
             }
-            props.onClose()
-        })
+        }
+    }, [sendFiles])
+
+    async function sendFilesHandler() {
+        if(sendFiles != undefined) {
+            console.log(sendFiles)
+            await fetch(process.env.BASE_URL + '/chat/multiple', {
+                headers : { 
+                    'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN"),
+                },
+                method: 'POST',
+                body: sendFiles
+            }).then((res) => res.json()).then((data) => {
+                console.log(data)
+                props.socket.emit('message', {message: data})
+                props.appendNewChat(data)
+
+                if(getCookie('ROLE') == 'STAFF') {
+                    props.changeHeader(data)
+                } else {
+                    props.socket.emit('notify-all-staff', {message: data})
+                }
+
+                props.onClose()
+            })
+        }
     }
     
     return (
@@ -46,18 +66,26 @@ function FilePopup(props:any) {
                     </div>
                     <ImCross size={12} color='rgb(156 163 175)' className='hover:cursor-pointer' onClick={props.onClose} />
                 </div>
-                <div className='files-container w-full h-[200px] my-2 display-scrollbar'>
+                <div className='files-container w-full max-h-[200px] my-2 display-scrollbar'>
                     {
                         props.fixFiles.map((src, index) => (
                             <CardFiles src={src} fileName={props.files[index].name} fileSize={props.files[index].size} fileExt={props.files[index].type} />
                         ))
                     }
                 </div>
-                <div className='w-full px-6 pb-6'>
-                    <input type="button" value={'Send ('+props.fixFiles.length+')'} className='w-full py-2 rounded-md bg-blue text-white font-bold hover:cursor-pointer' onClick={sendFilesHandler} />
-                </div>
+                {
+                    countFile == 0 ?
+                    <div className='w-full px-6 pb-6'>
+                        <input type="button" value={'You cannot send this file'} className='w-full py-2 rounded-md bg-blue text-white font-bold' />
+                    </div>
+                    :
+                    <div className='w-full px-6 pb-6'>
+                        <input type="button" value={'Send'} className='w-full py-2 rounded-md bg-blue text-white font-bold hover:cursor-pointer' onClick={sendFilesHandler} />
+                    </div>
+                }
             </div>
-        </div> : <></>
+        </div> : 
+        <></>
     )
 }
 

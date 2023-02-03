@@ -51,8 +51,7 @@ function FAQAddPopup(props:any) {
                     solution: solution,
                     target: arr
                 })
-            }).then(res => res.json())
-            props.refetch(props.category.id)
+            }).then(res => res.json()).then(() => props.refetch(props.category.id))
         }
     }
 
@@ -87,12 +86,11 @@ function FAQAddPopup(props:any) {
                             labelledBy="Please select role"
                         />
                     </div>
-                    <div className='h-px bg-secblack my-2' />
                     {
                         errorMsg !== '' ? <AlertError title={errorMsg} onClose={() => setErrorMsg('')} /> : <></>
                     }
-                    <div className='flex justify-end mt-2'>
-                        <input type="button" value='Insert' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' onClick={addFAQHandler} />
+                    <div className='flex justify-end mt-2 border-t-2 border-secblack'>
+                        <input type="button" value='Insert' className='bg-blue mt-2 text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' onClick={addFAQHandler} />
                     </div>
                 </form>
             </div>

@@ -39,7 +39,7 @@ function UserMessage(props:any) {
     }
     
     return (
-        props.data.staff != null ?
+        props.data.staff != null || props.data.staffId ?
             props.data.message != null && props.data.message?.trim() != '' ? 
                 // user tidak ada before dan tidak ada after
                 moment(props.before?.time).format('hh:mm A') != moment(props.data.time).format('hh:mm A') && moment(props.after?.time).format('hh:mm A') != moment(props.data.time).format('hh:mm A') ?
@@ -501,35 +501,19 @@ function UserMessage(props:any) {
                             <div onMouseOver={() => setMore(true)} onMouseOut={() => setMore(false)} className='flex items-end hover:cursor-pointer'>
                                 {
                                     props.data.file?.type.match('image.*') ? 
-                                    <div className='flex items-end'>
-                                        <img src={process.env.BASE_URL+'/'+props.data.file?.id} alt="" className='max-w-xs rounded-lg text-smalltext' />
-                                        {
-                                            props.data.readTime == null ?
-                                            <BiCheck size={15} color={'rgb(107 114 128)'} className='ml-2' />
-                                            :
-                                            <BiCheckDouble size={15} color={'rgb(107 114 128)'} className='ml-2' />
-                                        }
-                                    </div>
+                                    <img src={process.env.BASE_URL+'/'+props.data.file?.id} alt="" className='max-w-xs rounded-lg text-smalltext' />
                                     :
                                     <div className='flex justify-start items-center bg-gray-200 max-w-2xl py-1.5 px-2 rounded-lg text-smalltext'>
                                         <div className='mr-3 object-contain flex justify-center'>
                                             <AiOutlineFolder size={50} color='#222222' />
                                         </div>
-                                        <div className='flex items-end'>
-                                            <div className='flex flex-col'>
-                                                <div className='text-smalltext'>
-                                                    {props.data.file?.name}
-                                                </div>
-                                                <div className='text-tinytext text-gray-500 mt-0.5'>
-                                                    {(props.data.file?.fileSize/1024).toFixed(0)+'KB'}
-                                                </div>
+                                        <div className='flex flex-col'>
+                                            <div className='text-smalltext'>
+                                                {props.data.file?.name}
                                             </div>
-                                            {
-                                                props.data.readTime == null ?
-                                                <BiCheck size={15} color={'rgb(107 114 128)'} className='ml-2' />
-                                                :
-                                                <BiCheckDouble size={15} color={'rgb(107 114 128)'} className='ml-2' />
-                                            }
+                                            <div className='text-tinytext text-gray-500 mt-0.5'>
+                                                {(props.data.file?.fileSize/1024).toFixed(0)+'KB'}
+                                            </div>
                                         </div>
                                     </div>
                                 }
@@ -537,7 +521,7 @@ function UserMessage(props:any) {
                                     more ? 
                                     <Popup trigger={
                                         <div>
-                                            <RiMoreFill color='rgb(107 114 128)' size={20} className='mr-1.5'/>
+                                            <RiMoreFill color='rgb(107 114 128)' size={20} className='ml-1.5'/>
                                         </div>
                                     } position="bottom left"
                                     closeOnDocumentClick>

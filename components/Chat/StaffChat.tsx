@@ -239,9 +239,12 @@ function UserChat(props:any) {
 
     useEffect(() => {
         if(files.length != 0 ) {
+            console.log('ini files')
+            console.log(files)
             let list = []
             for(let i = 0; i < files.length; i++) {
-                list.push(URL.createObjectURL(files[i]))
+                // list.push(URL.createObjectURL(files[i]))
+                list.push(files[i])
             }
             setFixFiles(list)
         }

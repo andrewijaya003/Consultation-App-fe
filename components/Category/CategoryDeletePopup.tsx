@@ -21,7 +21,7 @@ function CategoryDeletePopup(props:any) {
                 body: JSON.stringify({
                     id: id
                 })
-            }).then(res => res.json()).then(props.refetch)
+            }).then(res => res.json()).then(() => props.refetch())
         }
     }
 

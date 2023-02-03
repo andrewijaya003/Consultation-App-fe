@@ -5,6 +5,7 @@ import { useDebounce } from 'use-debounce'
 import AlertLoading from '../components/AlertLoading'
 import CategoryAddPopup from '../components/Category/CategoryAddPopup'
 import CategoryList from '../components/Category/CategoryList'
+import { mutate } from 'swr'
 
 const fetcher = (endpoint: RequestInfo | URL) =>fetch(endpoint, {
         headers: {
@@ -17,11 +18,31 @@ function ManageCategory(props:any) {
     const [add, setAdd] = useState(false)
     const [search, setSearch] = useState('')
     const [endpoint, setEndpoint] = useState(process.env.BASE_URL+'/category')
-    const {data, mutate} = useSWR(endpoint, fetcher)
+    // const {data, mutate} = useSWR(endpoint, fetcher)
+    // const [data, setData] = useState()
     const [bounceSearch] = useDebounce(search, 1000)
 
-    const refetch = async () => {
-        await mutate()
+    // async function fetchCategory() {
+    //     await fetch(process.env.BASE_URL+'/category', {
+    //         headers: {
+    //             'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+    //         },
+    //         method: 'GET'
+    //     }).then(res => res.json()).then((d) => setData(d))
+    // }
+
+    // async function fetchCategorySearch() {
+    //     await fetch(process.env.BASE_URL+'/category/search/'+bounceSearch, {
+    //         headers: {
+    //             'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+    //         },
+    //         method: 'GET'
+    //     }).then(res => res.json()).then((d) => setData(d))
+    // }
+
+    const refetch = async (categoryId:string) => {
+        await mutate(process.env.BASE_URL+'/category')
+        await mutate(process.env.BASE_URL+'/faq/faq-by-category/'+categoryId)
         setAdd(false)
     }
 
@@ -33,39 +54,19 @@ function ManageCategory(props:any) {
         setSearch(value)
     }
 
-    useEffect(() => {
-        if(bounceSearch != '') {
-            setEndpoint(process.env.BASE_URL+'/category/search/'+bounceSearch)
-            mutate()
-            // fetch(process.env.BASE_URL+'/category/search/'+bounceSearch, {
-            //     headers: {
-            //         'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
-            //         'Content-type': 'application/json'
-            //     },
-            //     method: 'GET',
-            // }).then(
-            //     res => res.json()
-            // ).then(data => {
-            //     mutate(data)
-            // })
-        } else {
-            fetch(process.env.BASE_URL+'/category', {
-                headers: {
-                    'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
-                    'Content-type': 'application/json'
-                },
-                method: 'GET',
-            }).then(
-                res => res.json()
-            ).then(data => {
-                mutate(data)
-            })
-        }
-    }, [bounceSearch])
-
-    useEffect(() => {
-        console.log(data)
-    }, [data])
+    // useEffect(() => {
+    //     if(bounceSearch != '') {
+    //         console.log(bounceSearch)
+    //         fetch(process.env.BASE_URL+'/category/search/'+bounceSearch, {
+    //             headers: {
+    //                 'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
+    //             },
+    //             method: 'GET'
+    //         }).then(res => res.json()).then((d) => mutate([...d]))
+    //     } else {
+    //         mutate(process.env.BASE_URL+'/category')
+    //     }
+    // }, [bounceSearch])
 
     return (
         <>
@@ -102,9 +103,7 @@ function ManageCategory(props:any) {
                     </div>
                 </div>
                 {/* PageTitle End */}
-                {
-                    !data ? <AlertLoading title='categories' /> : <CategoryList categories={data} endpoint={endpoint} />
-                }
+                <CategoryList bounceSearch={bounceSearch} />
                 <CategoryAddPopup add={add} onClose={() => setAdd(false)} refetch={refetch} />
             </div>
         </>
