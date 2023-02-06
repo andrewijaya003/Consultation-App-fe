@@ -6,6 +6,7 @@
 		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",
+		"export": "next export",
 		"lint": "next lint"
 	},
 	"dependencies": {
@@ -21,7 +22,7 @@
 		"file_size_url": "^1.0.4",
 		"moment": "^2.29.4",
 		"moment-timezone": "^0.5.38",
-		"next": "12.3.1",
+		"next": "^12.3.1",
 		"next-session": "^4.0.5",
 		"nextjs-progressbar": "^0.0.16",
 		"react": "^18.2.0",

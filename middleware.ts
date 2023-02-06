@@ -21,7 +21,10 @@ export async function middleware(request:NextRequest) {
     }).then(data => data.json())
 
     if(data.access_token != undefined){
+        const response = NextResponse.next()
+        response.cookies.set('ACCESS_TOKEN', data.access_token)
         token = data.access_token
+        return response
     } else {
         token = undefined
     }
@@ -41,7 +44,7 @@ export async function middleware(request:NextRequest) {
         request.nextUrl.pathname = '/'
     } else if((pathname == '/' || pathname == '/LoginAD') &&  token != undefined) {
         request.nextUrl.pathname = '/home'
-    } else if(request.cookies.get('ROLE') !== 'STAFF' && (pathname == '/chat' || pathname == '/rating' || pathname == 'manage-category-faq')) {
+    } else if(request.cookies.get('ROLE') !== 'STAFF' && (pathname == '/chat' || pathname == '/rating' || pathname == '/manage-category-faq' || pathname == '/manage-meeting')) {
         request.nextUrl.pathname = '/404'
     } 
     else {
@@ -50,7 +53,11 @@ export async function middleware(request:NextRequest) {
 
     const response = NextResponse.redirect(request.nextUrl)
     if (token == undefined) {
+        response.cookies.set('ACCESS_TOKEN', '', {maxAge: 0})
+        response.cookies.set('REFRESH_TOKEN', '', {maxAge: 0})    
+        response.cookies.set('ROLE', '', {maxAge: 0})
         response.cookies.delete('ACCESS_TOKEN')
+        request.nextUrl.pathname = '/'
     }
 
     return response;

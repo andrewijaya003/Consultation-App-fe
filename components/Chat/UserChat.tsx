@@ -80,7 +80,6 @@ function UserChat(props:any) {
             if(chats != undefined) {
                 chats.map((chat:any) => {
                     if(chat.readTime == null && chat.user != null) {
-                        console.log('ini chat user')
                         chat.readTime = new Date()
                     }
                 })
@@ -200,7 +199,6 @@ function UserChat(props:any) {
 
     useEffect(() => {
         setIsFetchMore(false)
-        console.log(newChats)
         if(newChats.length != 0 && chats != undefined) {
             setChats([...chats, ...newChats])
         }
@@ -279,6 +277,8 @@ function UserChat(props:any) {
                 chats.unshift(data)
             }
             setChats([...chats])
+        } else {
+            setChats([...data])
         }
     }
 
@@ -315,7 +315,6 @@ function UserChat(props:any) {
     }
 
     useEffect(() => {
-        // console.log(bounceSearchChat)
         if(bounceSearchChat != '') {
             fetch(process.env.BASE_URL + '/chat/active-or-not-rated-room/'+searchChat, {
                 headers : { 
@@ -330,7 +329,6 @@ function UserChat(props:any) {
     }, [bounceSearchChat])
 
     useEffect(() => {
-        // console.log(searchChatData)
         setIndexChat(searchChatData.length-1)
         document.getElementById(searchChatData[indexChat]?.id)?.scrollIntoView()
     }, [searchChatData])
@@ -350,11 +348,9 @@ function UserChat(props:any) {
     }, [indexChat])
 
     useEffect(() => {
-        console.log(chats)
     }, [chats])
 
     useEffect(() => {
-        console.log(message)
         if(message != '') {
             socket.emit('read-all-message', props.roomChatId)
             socket.emit('start-typing')
@@ -364,13 +360,11 @@ function UserChat(props:any) {
     }, [message])
 
     useEffect(() => {
-        // console.log(isFetchMore)
     }, [isFetchMore])
 
     useEffect(() => {
         if(activeRoom != undefined) {
             if(activeRoom.lastChatTime == null) {
-                console.log(activeRoom)
                 let sendChat = new FormData()
                 sendChat.append('roomId', activeRoom.id)
                 sendChat.append('message', `Kode: ${user.code}\r\nNama: ${user.name}`)
@@ -387,18 +381,24 @@ function UserChat(props:any) {
                     socket.emit('notify-all-staff', {message: data})
                     appendNewChat(data)
                     setMessage('')
+                    setIsDisplay(true)
                 })
+            } else {
+                setIsDisplay(true)
             }
         }
     }, [activeRoom])
 
-    useEffect(() => {
-        setIsDisplay(false)
-        const timer = setTimeout(() => {
-            setIsDisplay(true)
-        }, 1500);
-        return () => clearTimeout(timer);
-    }, []);
+    // useEffect(() => {
+    //     if(activeRoom != undefined) {
+
+    //     }
+    //     setIsDisplay(false)
+    //     const timer = setTimeout(() => {
+    //         setIsDisplay(true)
+    //     }, 1500);
+    //     return () => clearTimeout(timer);
+    // }, [activeRoom]);
     
     return (
         isDisplay ?
@@ -459,7 +459,7 @@ function UserChat(props:any) {
                         </>
                         :
                         <div className='flex flex-col justify-center items-center w-full h-[110px] bg-black absolute opacity-70'>
-                            <div className='text-white mb-2'>
+                            <div className='text-white mb-2 text-smalltext md:text-normal text-center'>
                                 This chat has been closed. Please input rating if you want contact us again.
                             </div>
                             <div className='rounded bg-blue text-white p-2 hover:cursor-pointer font-bold' onClick={() => setAdd(true)}>

@@ -69,15 +69,16 @@ function UserChat(props:any) {
                     'Content-type': 'application/json'
                 },
                 method: 'PUT',
-            }).then(res => res.json()).then((data) => console.log(data))
+            }).then(res => res.json())
+            // .then((data) => console.log(data))
 
             if(rooms != undefined) {
                 rooms?.map((room:any) => {
                     if(room.id == data.data) {
-                        console.log(room.id+' '+data.data)
+                        // console.log(room.id+' '+data.data)
                         room.chats.map((chat:any) => {
                             if(chat.staff != null) {
-                                console.log('ini chat staff')
+                                // console.log('ini chat staff')
                                 chat.readTime = new Date()
                             }
                         })
@@ -152,6 +153,7 @@ function UserChat(props:any) {
 
     useEffect(() => {
         props.socket.on('client-start-typing', () => {
+            console.log('ketik')
             setIstyping(true)
         })
 
@@ -162,6 +164,7 @@ function UserChat(props:any) {
 
     useEffect(() => {
         props.socket.on('client-stop-typing', () => {
+            console.log('tidak ketik')
             setIstyping(false)
         })
 
@@ -170,6 +173,9 @@ function UserChat(props:any) {
         }
     }, [])
 
+    useEffect(() => {
+        console.log(isTyping)
+    }, [isTyping])
 
     container?.addEventListener('scroll', (e) => {
         setScrollBar(container.scrollTop)
@@ -314,7 +320,7 @@ function UserChat(props:any) {
     }, [props.userId, props.roomChatId])
     
     useEffect(() => {
-        console.log(rooms)
+        // console.log(rooms)
         if(rooms) {
             document.getElementById(props.focusIdComponent)?.scrollIntoView()
         }

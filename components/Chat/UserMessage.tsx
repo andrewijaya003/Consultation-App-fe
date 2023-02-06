@@ -307,7 +307,7 @@ function UserMessage(props:any) {
                             {
                                 props.data.file?.type.match('image.*') ? 
                                 <div className='flex items-end'>
-                                    <img src={process.env.BASE_URL+'/'+props.data.file?.id} alt="" className='max-w-xs rounded-lg text-smalltext' />
+                                    <img src={process.env.BASE_URL+'/'+props.data.file?.id} alt="" className='md:max-w-xs max-w-[280px] rounded-lg text-smalltext' />
                                     {
                                         props.data.readTime == null ?
                                         <BiCheck size={15} color={'rgb(107 114 128)'} className='ml-2' />
@@ -494,7 +494,7 @@ function UserMessage(props:any) {
                             <div onMouseOver={() => setMore(true)} onMouseOut={() => setMore(false)} className='flex items-end hover:cursor-pointer'>
                                 {
                                     props.data.file?.type.match('image.*') ? 
-                                    <img src={process.env.BASE_URL+'/'+props.data.file?.id} alt="" className='max-w-xs rounded-lg text-smalltext' />
+                                    <img src={process.env.BASE_URL+'/'+props.data.file?.id} alt="" className='md:max-w-xs max-w-[280px] rounded-lg text-smalltext' />
                                     :
                                     <div className='flex justify-start items-center bg-gray-200 max-w-2xl py-1.5 px-2 rounded-lg text-smalltext'>
                                         <div className='mr-3 object-contain flex justify-center'>

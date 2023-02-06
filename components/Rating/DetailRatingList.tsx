@@ -54,7 +54,7 @@ function DetailRatingList(props:any) {
                         <BsFillEmojiHeartEyesFill size={props.detail.rating == 5 ? 40 : 30} color={props.detail.rating == 5 ? '#00a9e2' : 'gray'} className="text-yellow-300" />
                     </li>
                 </ul> */}
-                <div className='flex justify-between items-center'>
+                <div className='flex md:flex-row flex-col justify-between md:items-center'>
                     {
                         props.detail.rating == 1 ? 
                         <div className='flex items-center'>

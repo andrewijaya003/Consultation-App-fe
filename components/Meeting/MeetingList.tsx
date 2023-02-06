@@ -43,11 +43,11 @@ function MeetingList(props:any) {
                     props.meetings.map((meeting:any) => (
                         <div className={`text-secblack flex sm:flex-col w-full lg:flex-row sm:items-center lg:items-start bg-white border border-gray-300 rounded-lg px-6 py-5 mb-6 shadow-xm `}>
                             <div className='flex flex-col w-full'>
-                                <div className='flex justify-between w-full'>
-                                    <div className='text-start mb-2 text-[19px] font-bold whitespace-pre-wrap break-word'>
+                                <div className='flex md:flex-row flex-col justify-between w-full'>
+                                    <div className='text-start md:mb-2 mb-0 text-[19px] font-bold whitespace-pre-wrap break-word'>
                                         MEETING WITH {meeting.user.code} - {meeting.user.name.toUpperCase()}
                                     </div>
-                                    <div className={`${meeting.status === 'Done' ? 'text-[#83d475]' : meeting.status === 'Pending' ? 'text-yellow' : 'text-red'}  items-center text-normal font-bold`}>
+                                    <div className={`${meeting.status === 'Done' ? 'text-[#83d475]' : meeting.status === 'Pending' ? 'text-yellow' : 'text-red'} md:mb-0 mb-2 items-center text-normal font-bold`}>
                                         {meeting.status}
                                     </div>
                                 </div>

@@ -56,13 +56,13 @@ function AnnouncementList(props:any) {
                             {/* <div>{announcement.file.id}</div> */}
                             <img className='max-w-[140px] object-contain w-full lg:mr-6 sm:mb-6 lg:mb-0' src={ announcement.file != null ? process.env.BASE_URL+'/'+announcement.file.id:'https://i.ibb.co/xHzDz3R/announcement-placeholder.png' } />
                             <div className='flex flex-col w-full'>
-                                <div className='flex justify-between'>
-                                    <div className='text-start mb-2 text-[19px] font-bold whitespace-pre-wrap break-all'>
+                                <div className='flex md:flex-row flex-col justify-between'>
+                                    <div className='text-start md:mb-2 mb-0 text-[19px] font-bold whitespace-pre-wrap break-all'>
                                         { announcement.title }
                                     </div>
                                     {
                                         getCookie('ROLE') == 'STAFF' ?
-                                        <div className='flex text-end text-tinytext text-gray-400 h-fit whitespace-pre-wrap'>
+                                        <div className='flex text-end text-tinytext text-gray-400 h-fit md:mb-0 mb-2'>
                                             Posted for
                                             {
                                                 announcement.target.map((role:any, index:BigInteger) => (

@@ -9,7 +9,7 @@ import PageTitle2 from '../PageTitle2'
 function AnnouncementEditPopup(props:any) {
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
-    const [image, setImage] = useState('')
+    const [image, setImage] = useState<File>()
     const [errorMsg, setErrorMsg] = useState('')
     const [option, setOption] = useState([
         {label:'FS',value:'FS'},
@@ -75,13 +75,13 @@ function AnnouncementEditPopup(props:any) {
                         <label htmlFor='title' className='text-smalltext flex whitespace-pre-wrap break-all font-semibold text-gray-700 mb-1'>
                             Title <div className='text-red'>*</div>
                         </label>
-                        <input value={title} name='title' id='title' type='text' className='border border-gray-300 rounded-md px-3 py-1.5 outline-0 shadow-sm focus:ring-1 focus:border-blue text-smalltext' required onChange={(e) => setTitle(e.target.value)} /> 
+                        <input value={title} name='title' id='title' type='text' className='border border-gray-300 rounded-md px-3 py-1.5 outline-0 shadow-sm focus:ring-1 focus:border-blue text-smalltext' required onChange={(e:any) => setTitle(e.target.value)} /> 
                     </div>
                     <div className='flex flex-col mb-6'>
                         <label htmlFor='description' className='text-smalltext flex whitespace-pre-wrap break-all font-semibold text-gray-700 mb-1'>
                             Desription <div className='text-red'>*</div>
                         </label>
-                        <textarea value={description} name='description' id='description' maxLength='500' rows="8" className='border border-gray-300 rounded-md px-3 py-1.5 outline-0 shadow-sm focus:ring-1 focus:border-blue text-smalltext' required onChange={(e) => setDescription(e.target.value)} />
+                        <textarea value={description} name='description' id='description' maxLength={500} rows={500} className='border border-gray-300 rounded-md px-3 py-1.5 outline-0 shadow-sm focus:ring-1 focus:border-blue text-smalltext' required onChange={(e:any) => setDescription(e.target.value)} />
                     </div>
                     <div className='flex flex-col mb-6'>
                         <label htmlFor='image' className='text-smalltext flex whitespace-pre-wrap break-all font-semibold text-gray-700 mb-1'>
@@ -89,8 +89,8 @@ function AnnouncementEditPopup(props:any) {
                         </label>
                         <label htmlFor='image' className="w-full flex items-center border border-gray-300 rounded-md">
                             <div className='w-[100px] text-center text-sm bg-gray-200 px-3 py-2 mr-2'>Choose File</div>
-                            <div className='w-10/12 h-full cursor-pointer text-sm rounded-md bg-white whitespace-nowrap overflow-x-auto z-10'>{image != null ? image.name : 'No File Chosen'}</div>
-                            <input id='image' className="w-0 cursor-pointer text-sm rounded-md  bg-white file:border-0" aria-describedby="user_avatar_help" type="file" onChange={(e) => setImage(e.target.files[0])} />
+                            <div className='w-10/12 h-full cursor-pointer text-sm rounded-md bg-white whitespace-nowrap overflow-x-auto z-10'>{image != undefined ? image.name : 'No File Chosen'}</div>
+                            <input id='image' className="w-0 cursor-pointer text-sm rounded-md  bg-white file:border-0" aria-describedby="user_avatar_help" type="file" onChange={(e:any) => setImage(e.target.files[0])} />
                         </label>
                     </div>
                     <div className='flex flex-col mb-6'>

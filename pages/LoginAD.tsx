@@ -8,6 +8,7 @@ import { useCallback } from "react";
 import type { Container, Engine } from "tsparticles-engine";
 import Particles from "react-tsparticles";
 import { loadFull } from "tsparticles";
+import ReactLoading from 'react-loading';
 
 function loginAD() {
     const microsoftIsAuthenticated = useIsAuthenticated();
@@ -156,11 +157,12 @@ function loginAD() {
 			/>
 
             <div className="w-screen h-screen flex flex-col justify-center items-center move-bg">
-                <div className=' text-center text-white font-bold border-white border-b-4'>
+                <div className={`text-center text-white font-bold border-white ${errorMsg == 'please wait' ? '' : 'border-b-4' }`}>
                     {
                         errorMsg == 'please wait' ?
-                        <p className='text-bigtitle'>
+                        <p className='flex text-bigtitle flex-col justify-center items-center'>
                             PLEASE WAIT
+							<ReactLoading type={'bars'} color={'#ffffff'} width={100} height={0} />
                         </p>
                         :
                         <p className='text-bigtitle'>

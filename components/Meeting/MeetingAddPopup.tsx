@@ -41,6 +41,10 @@ function MeetingAddPopup(props:any) {
             setErrorMsg('Time must be filled')
         } else if(description === '') {
             setErrorMsg('Notes for student must be filled')
+        } else if(pic == undefined) {
+            setErrorMsg('PIC must be filled')
+        } else if(location == '') {
+            setErrorMsg('Location must be filled')
         }
 
         if(email !== '' && date !== '' && time !== '' && description !== '') {

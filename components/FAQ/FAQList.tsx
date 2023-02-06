@@ -86,26 +86,27 @@ function FAQList(props:any) {
                         :
                         data?.map((faq:any) => (
                             <div className='flex flex-col border border-gray-300 rounded-lg px-3.5 py-3 mb-6 bg-white shadow-xm'>
-                                <div className='flex justify-between w-full'>
-                                    <div className='text-smalltext font-bold mb-0.5'>
-                                        Problem:
-                                    </div>
-                                    <div className='flex text-end text-tinytext text-gray-400 h-fit whitespace-pre-wrap'>
-                                        Posted for
-                                        {
-                                            faq.target.map((role:any, index:BigInteger) => (
-                                                <div className='font-bold'>
-                                                    {
-                                                        index == 0 ? 
-                                                        ' '+role
-                                                        :
-                                                        ', '+role
-                                                    }
-                                                </div>
-                                            ))
-                                        }
-                                    </div>
+                                <div className='w-full flex justify-end text-end text-tinytext text-gray-400 h-fit'>
+                                    Posted for
+                                    {
+                                        faq.target.map((role:any, index:BigInteger) => (
+                                            // <div className='font-bold'>
+                                                // {
+                                                    index == 0 ? 
+                                                    ' '+role
+                                                    :
+                                                    ', '+role
+                                                // }
+                                            // </div>
+                                        ))
+                                    }
                                 </div>
+                                <div className='text-smalltext font-bold mb-0.5'>
+                                    Problem:
+                                </div>
+                                {/* <div className='flex justify-between w-full'>
+                                    
+                                </div> */}
                                 <div className='text-normal white-pre-wrap break-words'>
                                     { faq.problem }
                                 </div>

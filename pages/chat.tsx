@@ -75,7 +75,7 @@ function chat() {
         if(rooms == undefined) return
 
         socket.on('staff-notification', ((data:any) => {
-            console.log(data)
+            // console.log(data)
             if(rooms != undefined) {
                 if(data.data.message[0]?.file != null) {
                     rooms.map((room:any) => {
@@ -106,11 +106,11 @@ function chat() {
         if(rooms == undefined) return
 
         socket.on('room-status-change', ((data:any) => {
-            console.log(data)
-            console.log(rooms)
+            // console.log(data)
+            // console.log(rooms)
             if(rooms != undefined) {
                 if(data.data.message[0]?.file != null) {
-                    console.log('masuk ke file nih')
+                    // console.log('masuk ke file nih')
                     rooms.map((room:any) => {
                         if(room.lastChat.roomId == data.data.message[0].id) {
                             room.lastChat.status = data.data.message[data.data.message.length-1].status
@@ -120,7 +120,7 @@ function chat() {
                 } else {
                     rooms.map((room:any) => {
                         if(room.lastChat.roomId == data.data.message.id) {
-                            console.log('masuk ke tidak file nih')
+                            // console.log('masuk ke tidak file nih')
                             room.lastChat.status = data.data.message.status
                             room.status = data.data.message.status
                         }
@@ -136,7 +136,7 @@ function chat() {
     }, [rooms])
 
     function changeHeader(message:any) {
-        console.log('ini change')
+        // console.log('ini change')
         if(rooms != undefined) {
             if(message[0]?.file != null) {
                 rooms.map((room:any) => {
@@ -160,7 +160,7 @@ function chat() {
         if(rooms != undefined) {
             rooms.map((room:any) => {
                 if(room.lastChat.roomId == roomId && room.lastChat.staff == null) {
-                    console.log(room.lastChat)
+                    // console.log(room.lastChat)
                     room.lastChat.readTime = new Date()
                 }
             })
@@ -184,7 +184,7 @@ function chat() {
 
     useEffect(() => {
         if(isFetchMore && rooms != undefined && offsetRooms != 0) {
-            if(role == '' && categoryId == '' && bounceUsername == ''){
+            if(role == '' && categoryId == '' && username == ''){
                 fetch(process.env.BASE_URL+'/room-chat/preview-all', {
                     headers: {
                         'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
@@ -236,6 +236,7 @@ function chat() {
                     setNewRooms(data)
                 })
             } else {
+                // console.log('ini username 1')
                 fetch(process.env.BASE_URL+'/room-chat/preview', {
                     headers: {
                         'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
@@ -265,7 +266,7 @@ function chat() {
         setUserId('')
         setRoomChatId('')
         setUserId(data.user?.id)
-        if(role == '' && categoryId == '' && bounceUsername == '') {
+        if(role == '' && categoryId == '' && username == '') {
             setRoomChatId(data.lastChat.roomId)
         } else {
             setRoomChatId(data.lastRoomChatId)
@@ -335,6 +336,7 @@ function chat() {
 
     const refetchRoomsFilter = async (role:string, categoryId:string, username:string) => {
         if(role != '') {
+            // console.log('ini role')
             await fetch(process.env.BASE_URL+'/room-chat/preview', {
                 headers: {
                     'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
@@ -352,6 +354,7 @@ function chat() {
                 setTakeRooms(20)
             })
         } else if(categoryId != '') {
+            // console.log('ini category')
             await fetch(process.env.BASE_URL+'/room-chat/preview', {
                 headers: {
                     'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
@@ -368,7 +371,8 @@ function chat() {
                 setOffsetRooms(10)
                 setTakeRooms(20)
             })
-        } else {
+        } else if(username != '') {
+            // console.log('ini username')
             await fetch(process.env.BASE_URL+'/room-chat/preview', {
                 headers: {
                     'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
@@ -381,6 +385,7 @@ function chat() {
                     take: 10
                 })
             }).then(res => res.json()).then(data => {
+                // console.log(data)
                 setRooms(data)
                 setOffsetRooms(10)
                 setTakeRooms(20)
@@ -390,20 +395,20 @@ function chat() {
 
     useEffect(() => {
         if(offsetRooms == 0 && rooms == undefined) {
-            if(role == '' && categoryId == '' && bounceUsername == '') {
+            if(role == '' && categoryId == '' && username == '') {
                 refetchRooms()
             } else {
                 resetHeaderChat()
-                refetchRoomsFilter(role, categoryId, bounceUsername)
+                refetchRoomsFilter(role, categoryId, username)
             }
         }
-    }, [role, categoryId, bounceUsername, offsetRooms, rooms])
+    }, [role, categoryId, username, offsetRooms, rooms])
 
     function handleJoinRoomChat(header:Object) {
         socket.emit('staff-join-user-room', {userId: header.user?.id})
         socket.emit('read-all-message', header.lastChat.roomId)
         readHeader(header.lastChat.roomId)
-        console.log('hallo')
+        // console.log('hallo')
     }
     
     function handleJoinRoomChatFilter(header:Object) {
@@ -449,7 +454,7 @@ function chat() {
                                 <div>
                                     <BiCategoryAlt size={23} className='hover:cursor-pointer' />
                                 </div>
-                            } position="bottom left"
+                            } position="bottom right"
                             closeOnDocumentClick>
                                 <div className={`flex flex-col w-full mt-2 border border-gray-300 shadow-sm rounded-md hover:cursor-pointer bg-white`} >
                                 {
@@ -472,7 +477,7 @@ function chat() {
                                 rooms.length != 0 ?
                                     !(rooms.length == 1 && rooms[0].lastChat == null) ?
                                         rooms.map((header:any) => (
-                                            role == '' && categoryId == '' && bounceUsername == '' ?
+                                            role == '' && categoryId == '' && username == '' ?
                                             <div onClick={() => handleJoinRoomChat(header)}>
                                                 <HeaderChat socket={socket} getChats={() => handleHeaderChat(header)} header={header} />
                                             </div>

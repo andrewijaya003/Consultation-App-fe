@@ -82,7 +82,7 @@ function AnnouncementAddPopup(props:any) {
                             Image <div className='text-red'></div>
                         </label>
                         <div className="flex justify-center">
-                            <input className="w-full cursor-pointer border border-gray-300 focus:ring-1 focus:border-blue text-sm rounded-md file:px-3 file:py-2 bg-white file:border-0" aria-describedby="user_avatar_help" id="user_avatar" type="file" onChange={(e) => setImage(e.target.files[0])} />
+                            <input className="w-full cursor-pointer border border-gray-300 focus:ring-1 focus:border-blue text-sm rounded-md file:px-3 file:py-2 bg-white file:border-0" aria-describedby="user_avatar_help" id="user_avatar" type="file" onChange={(e:any) => setImage(e.target.files[0])} />
                         </div>
                     </div>
                     <div className='flex flex-col mb-6'>

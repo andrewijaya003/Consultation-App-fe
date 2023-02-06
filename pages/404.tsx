@@ -4,7 +4,7 @@ import type { Container, Engine } from "tsparticles-engine";
 import Particles from "react-tsparticles";
 import { loadFull } from "tsparticles";
 
-function notFound() {
+function NotFound() {
     const particlesInit = useCallback(async (engine: Engine) => {
         await loadFull(engine);
     }, []);
@@ -111,4 +111,4 @@ function notFound() {
     )
 }
 
-export default notFound
+export default NotFound

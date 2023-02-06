@@ -78,7 +78,7 @@ function UserNotes(props:any) {
         <div className='fixed top-0 left-0 w-full h-full flex justify-center items-center bg-popupbg z-20' onClick={props.onClose}>
             <div className='sm:max-w-screen-sm lg:max-w-screen-xm w-full px-4 py-5 flex flex-col ml-auto mr-auto text-secblack bg-white rounded-md' onClick={(e) => e.stopPropagation()}>
                 <PageTitle2 title='Insert User Notes' sectitle='user notes' />
-                <div className='flex flex-col my-6'>
+                <div className='flex flex-col my-2'>
                     <label htmlFor='notes' className='text-smalltext flex whitespace-pre-wrap break-all font-semibold text-gray-700 mb-1'>
                         New user notes <div className='text-red'>*</div>
                     </label>
@@ -87,8 +87,8 @@ function UserNotes(props:any) {
                 <div className='flex w-full justify-end'>
                     <input type="button" value='Insert' className='bg-blue text-white text-normal font-semibold rounded px-4 py-1.5 hover:cursor-pointer' onClick={addNotesHandler} />
                 </div>
-                <div className='h-px bg-secblack my-2' />
-                <div className='flex flex-col mt-6 pr-2 max-h-[420px] display-scrollbar'>
+                <div className='h-px bg-secblack mt-2' />
+                <div className='flex flex-col mt-4 pr-2 max-h-[350px] display-scrollbar'>
                     {
                         userNoteData ?
                             userNoteData.length != 0 ?
