@@ -238,6 +238,7 @@ function UserChat(props:any) {
                 take: 15
             })
         }).then(res => res.json()).then((data) => {
+            console.log(data)
             setChats(data)
             setOffsetChats(15)
             setTakeChats(30)
@@ -268,6 +269,7 @@ function UserChat(props:any) {
     }
 
     function appendNewChat(data:any) {
+        console.log(data)
         if(chats != undefined) {
             if(data[0]?.file != null) {
                 data.map((message:any) => {
@@ -278,7 +280,11 @@ function UserChat(props:any) {
             }
             setChats([...chats])
         } else {
-            setChats([...data])
+            if(data != undefined) {
+                let arr = []
+                arr.push(data)
+                setChats(arr)
+            }
         }
     }
 
@@ -348,6 +354,9 @@ function UserChat(props:any) {
     }, [indexChat])
 
     useEffect(() => {
+        if(chats != undefined) {
+            setIsDisplay(true)
+        }
     }, [chats])
 
     useEffect(() => {
@@ -387,6 +396,7 @@ function UserChat(props:any) {
                 setIsDisplay(true)
             }
         }
+        console.log(activeRoom)
     }, [activeRoom])
 
     // useEffect(() => {
@@ -445,7 +455,7 @@ function UserChat(props:any) {
                         // !activeRoom ?
                         // <></>
                         // :
-                        activeRoom ?
+                        activeRoom != undefined ?
                         <>
                             <div className='flex w-full h-[60px] items-start'>
                                 <textarea value={message} placeholder='Enter a message' className='px-3 mt-3 h-full text-smalltext w-full resize-none outline-none' onChange={(e) => setMessage(e.target.value)} onKeyDown={(e) => handleEnterDown(e)} onKeyUp={(e) => handleEnterUp(e)} />

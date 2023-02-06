@@ -50,7 +50,6 @@ function contact() {
     useEffect(() => {
         setInfoCategory(true)
         setLoadingCategory(true)
-        
         fetchCategory()
     }, [])
 
@@ -102,6 +101,7 @@ function contact() {
     }
 
     useEffect(() => {
+        console.log(roomChat)
         setRoomChatData(roomChat)
     }, [roomChat])
 
@@ -132,7 +132,7 @@ function contact() {
             </div>
             {
                 roomChatData != undefined ?
-                <UserChat chatUs={chatUs} setChatUs={setChatUs} mutateRoomChat={mutateRoomChat} resetRoomChatData={() => setRoomChatData(undefined)} roomChatId={roomChatData.id} />
+                <UserChat mutateRoomChat={mutateRoomChat} resetRoomChatData={() => setRoomChatData(undefined)} roomChatId={roomChatData.id} />
                 :
                 <div className="w-full flex flex-col">
                     {

@@ -61,12 +61,12 @@ function RatingAddPopup(props:any) {
                     ratingDescription: description,
                     advice: advice
                 })
-            }).then((res) => res.json()).then(() => {
-                props.resetRoomChatData()
-                props.mutateRoomChat(undefined)
-                props.refetch()
-                router.push('/home')
-            })
+            }).then((res) => res.json())
+            
+            await props.resetRoomChatData()
+            await  props.mutateRoomChat(undefined)
+            await props.refetch()
+            await router.push('/home')
         }
     }
 
