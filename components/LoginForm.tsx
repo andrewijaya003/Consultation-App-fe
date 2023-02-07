@@ -22,59 +22,9 @@ function LoginForm() {
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
     const [errorMsg, setErrorMsg] = useState('')
-    const microsoftIsAuthenticated = useIsAuthenticated();
-	const { instance, accounts } = useMsal();
-	const [graphData, setGraphData] = useState(null);
-    const role = getCookie('ROLE')
     const [actor, setActor] = useState('')
-
-    // useEffect(() => {
-    //     console.log(microsoftIsAuthenticated)
-    //     if(microsoftIsAuthenticated == true){
-	// 		instance
-	// 		.acquireTokenSilent({
-	// 			...loginRequest,
-	// 			account: accounts[0],
-	// 		})
-	// 		.then((response) => {
-	// 			callMsGraph(response.accessToken).then((response) =>
-	// 			setGraphData(response)
-	// 			);
-	// 		}).catch((err) => console.log(err))
-    //     }
-    // }, [microsoftIsAuthenticated]);
-
-	// useEffect(() => {
-    //     console.log(graphData)
-    //     if(graphData !== null) {
-	// 		fetch(process.env.BASE_URL+'/auth/login', {
-    //             headers : { 
-    //                 "Content-Type" : "application/json" 
-    //             },
-    //             method: 'POST',
-    //             body: JSON.stringify({
-	// 				email: accounts[0].username,
-	// 				role: window.localStorage.getItem('ROLE') == undefined ? 'STUDENT' : window.localStorage.getItem('ROLE')
-	// 			})
-    //         }).then(
-    //             res => res.json()
-    //         ).then((data) => {
-    //             if(data.statusCode > 300) {
-    //                 setErrorMsg('Check your role')
-    //                 setLoading(false)
-    //                 return
-    //             } else {
-    //                 setCookie('ACCESS_TOKEN', data.access_token, {maxAge: 7200})
-    //                 setCookie('REFRESH_TOKEN', data.refresh_token, {maxAge: 7200})
-    //                 setCookie('ROLE', window.localStorage.getItem('ROLE') == undefined ? 'STUDENT' : window.localStorage.getItem('ROLE'), {maxAge: 7200})
-    //                 setLoading(false)
-    //                 router.push('/home')
-    //             }
-    //         }).catch(() => {
-    //             setErrorMsg('Wrong credential')
-    //         })
-	// 	}
-	// }, [graphData])
+    const microsoftIsAuthenticated = useIsAuthenticated();
+    const { instance, accounts } = useMsal();
 
     function actorHandler(value:any) {
         setActor(value)
@@ -122,8 +72,41 @@ function LoginForm() {
     }
 
     useEffect(() => {
-        console.log(errorMsg)
-    }, [errorMsg])
+        if(microsoftIsAuthenticated == true){
+			instance
+			.acquireTokenSilent({
+				...loginRequest,
+				account: accounts[0],
+			})
+			.then((response) => {
+				callMsGraph(response.accessToken).then((response) => {
+					fetch(process.env.BASE_URL+'/auth/login', {
+						headers : { 
+							"Content-Type" : "application/json" 
+						},
+						method: 'POST',
+						body: JSON.stringify({
+							email: accounts[0].username,
+							role: window.localStorage.getItem('ROLE') == undefined ? 'STUDENT' : window.localStorage.getItem('ROLE')
+						})
+					}).then(
+						res => res.json()
+					).then((data) => {
+						if(data.statusCode > 300) {
+							setErrorMsg('check your role')
+						} else {
+							setCookie('ACCESS_TOKEN', data.access_token, {maxAge: 7200})
+							setCookie('REFRESH_TOKEN', data.refresh_token, {maxAge: 7200})
+							setCookie('ROLE', window.localStorage.getItem('ROLE') == undefined ? 'STUDENT' : window.localStorage.getItem('ROLE'), {maxAge: 7200})
+							router.push('/home')
+						}
+					}).catch(() => {
+						setErrorMsg('credential')
+					})
+				});
+			}).catch((err) => console.log(err))
+        }
+    }, [microsoftIsAuthenticated]);
 
     return (
         <form

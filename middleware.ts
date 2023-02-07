@@ -21,6 +21,7 @@ export async function middleware(request:NextRequest) {
     }).then(data => data.json())
 
     if(data.access_token != undefined){
+        console.log(data.access_token)
         const response = NextResponse.next()
         response.cookies.set('ACCESS_TOKEN', data.access_token)
         token = data.access_token
