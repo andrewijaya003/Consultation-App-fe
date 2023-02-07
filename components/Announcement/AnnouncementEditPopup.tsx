@@ -81,7 +81,7 @@ function AnnouncementEditPopup(props:any) {
                         <label htmlFor='description' className='text-smalltext flex whitespace-pre-wrap break-all font-semibold text-gray-700 mb-1'>
                             Desription <div className='text-red'>*</div>
                         </label>
-                        <textarea value={description} name='description' id='description' maxLength={500} rows={500} className='border border-gray-300 rounded-md px-3 py-1.5 outline-0 shadow-sm focus:ring-1 focus:border-blue text-smalltext' required onChange={(e:any) => setDescription(e.target.value)} />
+                        <textarea value={description} name='description' id='description' maxLength={500} rows={8} className='border border-gray-300 rounded-md px-3 py-1.5 outline-0 shadow-sm focus:ring-1 focus:border-blue text-smalltext' required onChange={(e:any) => setDescription(e.target.value)} />
                     </div>
                     <div className='flex flex-col mb-6'>
                         <label htmlFor='image' className='text-smalltext flex whitespace-pre-wrap break-all font-semibold text-gray-700 mb-1'>
