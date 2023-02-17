@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { getCookie } from 'cookies-next';
+import { deleteCookie, getCookie, setCookie } from 'cookies-next';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react'
 import { TypeAnimation } from 'react-type-animation';
 
@@ -7,16 +8,46 @@ function Header() {
     const [date, setDate] = useState<Date>()
     const moment = require('moment')
     const [user, setUser] = useState({})
+    const refreshToken = getCookie('REFRESH_TOKEN')
+    const [check, setCheck] = useState(0)
+    const router = useRouter()
 
     useEffect(() => {
         setDate(moment(new Date()))
-
+0
         const interval = setInterval(() => {
             setDate(moment(new Date()))
-        }, 1000)
+        }, 3600000)
 
         return () => clearInterval(interval)
     }, [])
+
+    useEffect(() => {
+        const id = setInterval(() => {
+            if(refreshToken != undefined) {
+                const data = fetch(process.env.BASE_URL + '/auth/refresh-token', {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    method: 'POST',
+                    body: JSON.stringify({
+                        refresh_token: refreshToken
+                    })
+                }).then(res => res.json()).then((d) => {
+                    if(d.statusCode >= 400) {
+                        deleteCookie('ACCESS_TOKEN')
+                        deleteCookie('REFRESH_TOKEN')
+                        deleteCookie('ROLE')
+                        router.push('/')
+                    } else {
+                        setCookie('ACCESS_TOKEN', d.access_token)
+                    }
+                })
+            }
+            setCheck(check + 1)
+        }, 3000);
+        return () => clearInterval(id);
+    }, [check])
 
     useEffect(() => {
         fetch(process.env.BASE_URL+`/${getCookie('ROLE') === 'STAFF' ? 'staff' : 'user'}/me`, {

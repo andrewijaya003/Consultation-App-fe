@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import AnnouncementAddPopup from '../components/Announcement/AnnouncementAddPopup';
 import AnnouncementList from '../components/Announcement/AnnouncementList';
-import { getCookie } from 'cookies-next';
+import { getCookie, setCookie } from 'cookies-next';
 import * as cookie from 'cookie';
 import { useRouter } from 'next/router';
 import AlertLoading from '../components/AlertLoading';
@@ -20,12 +20,20 @@ function Home() {
     const [add, setAdd] = useState(false)
     const [search, setSearch] = useState('')
     const [endpointAnnouncementAll, setEndpointAnnouncementAll] = useState(process.env.BASE_URL+'/announcement')
-    const {data:announcementAll, mutate:announcementAllMutate} = useSWR(endpointAnnouncementAll, fetcherAll)
+    const {data:announcementAll, mutate:announcementAllMutate} = useSWR(endpointAnnouncementAll, fetcherAll, {revalidateOnFocus: false})
     const [bounceSearch] = useDebounce(search, 1000)
 
     // useEffect(() => {
-    //     console.log(announcementAll)
-    // }, [announcementAll])
+        // fetch('http://localhost:3000/api/refreshToken')
+        // .then((res) => res.json())
+        // .then((res) => {
+        //     console.log(res)
+        //     if(res.access_token != null) {
+        //         setCookie('ACCESS_TOKEN', res.access_token)
+        //     }
+        // })
+        // .catch((err) => console.log(err))
+    // }, [])
 
     const refetch = async () => {
         await announcementAllMutate()

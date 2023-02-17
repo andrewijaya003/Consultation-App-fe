@@ -48,7 +48,7 @@ function AnnouncementList(props:any) {
         <>
             <div className='flex flex-col'>
                 {
-                    announcements.length === 0?
+                    announcements.length == 0?
                     <AlertNoData title='announcement' />
                     :
                     announcements.map((announcement:any) => (
@@ -66,7 +66,7 @@ function AnnouncementList(props:any) {
                                             Posted for
                                             {
                                                 announcement.target.map((role:any, index:BigInteger) => (
-                                                    <div className='font-bold'>
+                                                    <div className='font-bold whitespace-pre-wrap'>
                                                         {
                                                             index == 0 ? 
                                                             ' '+role

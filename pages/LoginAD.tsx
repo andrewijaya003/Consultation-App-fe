@@ -53,8 +53,8 @@ function loginAD() {
 						} else {
 							console.log('not err')
 							setCookie('ACCESS_TOKEN', data.access_token, {maxAge: 7200})
-							setCookie('REFRESH_TOKEN', data.refresh_token, {maxAge: 7200})
-							setCookie('ROLE', window.localStorage.getItem('ROLE') == undefined ? 'STUDENT' : window.localStorage.getItem('ROLE'), {maxAge: 7200})
+							setCookie('REFRESH_TOKEN', data.refresh_token, {maxAge: 86400*7})
+							setCookie('ROLE', window.localStorage.getItem('ROLE') == undefined ? 'STUDENT' : window.localStorage.getItem('ROLE'), {maxAge: 86400*7})
 							router.push('/home')
 						}
 					}).catch(() => {

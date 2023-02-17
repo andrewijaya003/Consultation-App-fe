@@ -98,7 +98,6 @@ function LoginForm() {
 							setCookie('ACCESS_TOKEN', data.access_token, {maxAge: 7200})
 							setCookie('REFRESH_TOKEN', data.refresh_token, {maxAge: 7200})
 							setCookie('ROLE', window.localStorage.getItem('ROLE') == undefined ? 'STUDENT' : window.localStorage.getItem('ROLE'), {maxAge: 7200})
-							router.push('/home')
 						}
 					}).catch(() => {
 						setErrorMsg('credential')

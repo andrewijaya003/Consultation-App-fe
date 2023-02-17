@@ -32,7 +32,7 @@ const fetcherUser = (endpoint: RequestInfo | URL) =>fetch(endpoint, {
         method: 'GET',
     }).then(res => res.json())
 
-function chat() {
+function Chat() {
     const container = document.querySelector('#header-container')
     const [endpointCategories, setEndpointCategories] = useState(process.env.BASE_URL+'/category')
     // const {data: rooms, mutate: mutateRooms} = useSWR(endpointRooms, () => fetcher)
@@ -418,6 +418,10 @@ function chat() {
         readHeader(header.lastRoomChatId)
     }
 
+    useEffect(() => {
+        console.log(categories)
+    }, [categories])
+
     return (
         <div className='max-w-screen-xl w-full px-4 py-5 flex flex-col ml-auto mr-auto'>
             <div className='flex flex-col w-full text-secblack'>
@@ -458,12 +462,14 @@ function chat() {
                             closeOnDocumentClick>
                                 <div className={`flex flex-col w-full mt-2 border border-gray-300 shadow-sm rounded-md hover:cursor-pointer bg-white`} >
                                 {
-                                    categories ?
+                                    !categories ?
+                                    <></>
+                                    :
                                     categories.map((category:any) => (
                                         <div className='hover:bg-gray-100 px-3 py-2' onClick={() => handleCategory(category)} >
                                             {category.category}
                                         </div>
-                                    )) : <></>
+                                    ))
                                 }
                                 </div> 
                             </Popup>
@@ -476,7 +482,7 @@ function chat() {
                                 </div> : 
                                 rooms.length != 0 ?
                                     !(rooms.length == 1 && rooms[0].lastChat == null) ?
-                                        rooms.map((header:any) => (
+                                        rooms?.map((header:any) => (
                                             role == '' && categoryId == '' && username == '' ?
                                             <div onClick={() => handleJoinRoomChat(header)}>
                                                 <HeaderChat socket={socket} getChats={() => handleHeaderChat(header)} header={header} />
@@ -516,4 +522,4 @@ function chat() {
     )
 }
 
-export default chat
+export default Chat

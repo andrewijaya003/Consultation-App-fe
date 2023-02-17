@@ -102,7 +102,7 @@ function NotFound() {
                     </p>
                 </div>
                 <div className='text-white font-mont text-center text-normal mt-5 whitespace-pre-wrap break-word'>
-                    The page you're looking for isn't available.
+                    The page you&apos;re looking for isn&apos;t available.
                     <br/>
                     Try searching again or back to previous page.
                 </div>

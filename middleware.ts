@@ -6,9 +6,7 @@ export async function middleware(request:NextRequest) {
     let token = request.cookies.get('ACCESS_TOKEN')
     let refreshToken = request.cookies.get('REFRESH_TOKEN')
     let { pathname } = request.nextUrl
-    // const microsoftIsAuthenticated = useIsAuthenticated();
-	// const { instance, accounts } = useMsal();
-	// const [graphData, setGraphData] = useState(null);
+	// let response = NextResponse.next()
 
     const data = await fetch(process.env.BASE_URL + '/auth/refresh-token', {
         headers: {
@@ -21,45 +19,39 @@ export async function middleware(request:NextRequest) {
     }).then(data => data.json())
 
     if(data.access_token != undefined){
-        console.log(data.access_token)
-        const response = NextResponse.next()
+		console.log('a')
+		const response = NextResponse.next()
         response.cookies.set('ACCESS_TOKEN', data.access_token)
         token = data.access_token
-        return response
+		
+		if((pathname == '/' || pathname =='/LoginAD') && token != undefined) {
+			console.log('home nih hausnya')
+			request.nextUrl.pathname = '/home'
+		} else if(request.cookies.get('ROLE') !== 'STAFF' && (pathname == '/chat' || pathname == '/rating' || pathname == '/manage-category-faq' || pathname == '/manage-meeting')) {
+			request.nextUrl.pathname = '/404'
+		} else if(request.cookies.get('ROLE') == 'STAFF' && (pathname == '/contact' || pathname == '/meeting')) {
+			request.nextUrl.pathname = '/404'
+		} else {
+			return NextResponse.next()
+		}
     } else {
+		console.log('b')
         token = undefined
     }
+	
+	if(token == undefined && (pathname == '/' || pathname == '/LoginAD')) {
+		console.log('un')
+		return NextResponse.next()
+	}
 
-    if(pathname.startsWith("/_next")) {
-        const response = NextResponse.next()
-        if (token == undefined) {
-            response.cookies.set('ACCESS_TOKEN', '', {maxAge: 0})
-            response.cookies.set('REFRESH_TOKEN', '', {maxAge: 0})    
-            response.cookies.set('ROLE', '', {maxAge: 0})
-        }
+	const response = NextResponse.redirect(request.nextUrl)
+	console.log('masuk 49')
 
-        return response;
-    }
+	return response
+}
 
-    if(pathname != '/' && pathname != '/LoginAD' && token == undefined) {
-        request.nextUrl.pathname = '/'
-    } else if((pathname == '/' || pathname == '/LoginAD') &&  token != undefined) {
-        request.nextUrl.pathname = '/home'
-    } else if(request.cookies.get('ROLE') !== 'STAFF' && (pathname == '/chat' || pathname == '/rating' || pathname == '/manage-category-faq' || pathname == '/manage-meeting')) {
-        request.nextUrl.pathname = '/404'
-    } 
-    else {
-        return NextResponse.next()
-    }
-
-    const response = NextResponse.redirect(request.nextUrl)
-    if (token == undefined) {
-        response.cookies.set('ACCESS_TOKEN', '', {maxAge: 0})
-        response.cookies.set('REFRESH_TOKEN', '', {maxAge: 0})    
-        response.cookies.set('ROLE', '', {maxAge: 0})
-        response.cookies.delete('ACCESS_TOKEN')
-        request.nextUrl.pathname = '/'
-    }
-
-    return response;
+export const config = {
+	matcher: [
+		'/((?!api|_next/static|favicon.ico).*)',
+	],
 }
