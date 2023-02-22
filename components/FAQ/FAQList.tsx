@@ -107,13 +107,13 @@ function FAQList(props:any) {
                                 {/* <div className='flex justify-between w-full'>
                                     
                                 </div> */}
-                                <div className='text-normal whitespace-pre-wrap break-all'>
+                                <div className='text-normal whitespace-pre-wrap break-word'>
                                     { faq.problem }
                                 </div>
                                 <div className='text-smalltext font-bold mt-2.5 mb-0.5'>
                                     Solution:
                                 </div>
-                                <div className='text-normal whitespace-pre-wrap break-all'>
+                                <div className='text-normal whitespace-pre-wrap break-word'>
                                     { faq.solution }
                                 </div>
                                 {

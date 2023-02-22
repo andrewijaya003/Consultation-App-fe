@@ -19,13 +19,11 @@ export async function middleware(request:NextRequest) {
     }).then(data => data.json())
 
     if(data.access_token != undefined){
-		console.log('a')
 		const response = NextResponse.next()
         response.cookies.set('ACCESS_TOKEN', data.access_token)
         token = data.access_token
 		
 		if((pathname == '/' || pathname =='/LoginAD') && token != undefined) {
-			console.log('home nih hausnya')
 			request.nextUrl.pathname = '/home'
 		} else if(request.cookies.get('ROLE') !== 'STAFF' && (pathname == '/chat' || pathname == '/rating' || pathname == '/manage-category-faq' || pathname == '/manage-meeting')) {
 			request.nextUrl.pathname = '/404'
@@ -35,17 +33,14 @@ export async function middleware(request:NextRequest) {
 			return NextResponse.next()
 		}
     } else {
-		console.log('b')
         token = undefined
     }
 	
 	if(token == undefined && (pathname == '/' || pathname == '/LoginAD')) {
-		console.log('un')
 		return NextResponse.next()
 	}
 
 	const response = NextResponse.redirect(request.nextUrl)
-	console.log('masuk 49')
 
 	return response
 }
