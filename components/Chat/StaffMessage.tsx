@@ -26,16 +26,22 @@ function UserMessage(props:any) {
     }
 
     async function downloadUsingFetch(url:string, filename:string) {
-        const image = await fetch(url);
-        const imageBlog = await image.blob();
-        const imageURL = URL.createObjectURL(imageBlog);
+		// console.log(url+' '+filename)
+        await fetch(process.env.BASE_URL+'/'+url)
+		.then((res) => 
+			res.blob()
+		)
+		.then((blob) => {
+			const imageURL = URL.createObjectURL(blob);
+			const anchor = document.createElement("a");
+			anchor.href = imageURL;
+			anchor.download = filename;
+	
+			document.body.appendChild(anchor);
+			anchor.click();
+		})
+        // const imageBlog = await image.blob();
 
-        const anchor = document.createElement("a");
-        anchor.href = imageURL;
-        anchor.download = filename;
-
-        document.body.appendChild(anchor);
-        anchor.click();
     }
     
     return (
@@ -297,9 +303,10 @@ function UserMessage(props:any) {
                                         <div className='hover:bg-gray-100 px-3 py-2' onClick={() => unsendHanler(props.data.id)} >
                                             Unsend
                                         </div>
-                                        <div className='hover:bg-gray-100 px-3 py-2' onClick={() => downloadUsingFetch(props.data.file?.id, props.data.file?.name)}>
+                                        {/* <div className='hover:bg-gray-100 px-3 py-2' onClick={() => downloadUsingFetch(props.data.file?.id, props.data.file?.name)}>
                                             Download
-                                        </div>
+                                        </div> */}
+										<a className='hover:bg-gray-100 px-3 py-2 outline-none' href={`${process.env.BASE_URL+"/"+props.data.file?.id}`} download target={`_blank`}>Download</a>
                                     </div>
                                 </Popup>
                                 : <></>
