@@ -39,7 +39,7 @@ function UserChat(props:any) {
     const [shift, setShift] = useState(false)
     const [userId, setUserId] = useState('')
     const [roomChatId, setRoomChatId] = useState('')
-    const [endpointRooms, setEndpointRooms] = useState(process.env.BASE_URL+'/room-chat/room-chats-by-user/'+props.userId)
+    // const [endpointRooms, setEndpointRooms] = useState(process.env.BASE_URL+'/room-chat/room-chats-by-user/'+props.userId)
     // const {data: rooms, mutate: mutateRooms} = useSWR(endpointRooms, fetcher)
     const [offsetRooms, setOffsetRooms] = useState(0)
     const [takeRooms, setTakeRooms] = useState(3)
@@ -130,15 +130,18 @@ function UserChat(props:any) {
         props.socket.on('receive-message', ((data:any) => {
             console.log(data)
             if(rooms != undefined){
+				console.log(rooms)
                 if(data.data.message[0]?.file != null) {
                     if(rooms[0].chats[0] != undefined) {
                         data.data.message.map((message:any) => {
                             rooms[0].chats.unshift(message)
+							// rooms[0].status = 'Pending'
                         })
                     }
                 } else {
                     if(rooms[0].chats[0] != undefined) {
                         rooms[0].chats.unshift(data.data.message)
+						// rooms[0].status = 'Pending'
                     }
                 }
                 setRooms([...rooms])
@@ -172,10 +175,6 @@ function UserChat(props:any) {
             props.socket.off('client-stop-typing')
         }
     }, [])
-
-    useEffect(() => {
-        console.log(isTyping)
-    }, [isTyping])
 
     container?.addEventListener('scroll', (e) => {
         setScrollBar(container.scrollTop)
@@ -218,8 +217,8 @@ function UserChat(props:any) {
         }
     }, [isFetchMore])
 
-    useEffect(() => {
-        fetch(process.env.BASE_URL+'/room-chat/room-chats-by-user/', {
+	function fetchRooms() {
+		fetch(process.env.BASE_URL+'/room-chat/room-chats-by-user/', {
             headers: {
                 'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
                 'Content-type': 'application/json'
@@ -235,7 +234,11 @@ function UserChat(props:any) {
             setOffsetRooms(3)
             setTakeRooms(6)
         })
-    }, [props.userId])
+	}
+
+    useEffect(() => {
+        fetchRooms()
+    }, [props.userId, props.roomChatId])
     
 
     useEffect(() => {
@@ -315,7 +318,7 @@ function UserChat(props:any) {
     useEffect(() => {
         setUserId(props.userId)
         setRoomChatId(props.roomChatId)
-        setEndpointRooms(process.env.BASE_URL+'/room-chat/room-chats-by-user/'+props.userId)
+        // setEndpointRooms(process.env.BASE_URL+'/room-chat/room-chats-by-user/'+props.userId)
         setSearchChat('')
     }, [props.userId, props.roomChatId])
     
@@ -376,6 +379,10 @@ function UserChat(props:any) {
         setEndRoomChatPopup(true)
         setRoomForEndRoomChatPopup(room)
     }
+
+	useEffect(() => {
+		console.log(rooms)
+	}, [rooms])
     
     return (
         <>

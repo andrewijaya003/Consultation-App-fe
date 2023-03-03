@@ -75,13 +75,16 @@ function Chat() {
         if(rooms == undefined) return
 
         socket.on('staff-notification', ((data:any) => {
-            // console.log(data)
+            console.log(data)
             if(rooms != undefined) {
+				console.log(rooms)
                 if(data.data.message[0]?.file != null) {
                     rooms.map((room:any) => {
                         if(room.user.id == data.data.message[0].user.id) {
                             room.lastChat = data.data.message[data.data.message.length-1]
                             room.status = 'Pending'
+							console.log(data.data.message)
+							setRoomChatId(data.data.message?.roomId)
                         }
                     })
                 } else {
@@ -89,6 +92,8 @@ function Chat() {
                         if(room.user.id == data.data.message.user.id) {
                             room.lastChat = data.data.message
                             room.status = 'Pending'
+							console.log(data.data.message)
+							setRoomChatId(data.data.message?.roomId)
                         }
                     })
                 }
