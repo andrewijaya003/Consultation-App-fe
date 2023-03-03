@@ -303,9 +303,6 @@ function UserMessage(props:any) {
                                         <div className='hover:bg-gray-100 px-3 py-2' onClick={() => unsendHanler(props.data.id)} >
                                             Unsend
                                         </div>
-                                        {/* <div className='hover:bg-gray-100 px-3 py-2' onClick={() => downloadUsingFetch(props.data.file?.id, props.data.file?.name)}>
-                                            Download
-                                        </div> */}
 										<a className='hover:bg-gray-100 px-3 py-2 outline-none' href={`${process.env.BASE_URL+"/"+props.data.file?.id}`} download target={`_blank`}>Download</a>
                                     </div>
                                 </Popup>
@@ -533,9 +530,7 @@ function UserMessage(props:any) {
                                     } position="bottom left"
                                     closeOnDocumentClick>
                                         <div className={`flex flex-col w-full mt-2 border border-gray-300 shadow-sm rounded-md hover:cursor-pointer bg-white`}>
-                                            <div className='hover:bg-gray-100 px-3 py-2' onClick={() => downloadUsingFetch(props.data.file?.id, props.data.file?.name)} >
-                                                Download
-                                            </div>
+											<a className='hover:bg-gray-100 px-3 py-2 outline-none' href={`${process.env.BASE_URL+"/"+props.data.file?.id}`} download target={`_blank`}>Download</a>
                                         </div>
                                     </Popup>
                                     : <></>
