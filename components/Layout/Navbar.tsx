@@ -3,7 +3,7 @@ import { GiHamburgerMenu } from "@react-icons/all-files/gi/GiHamburgerMenu";
 import { FaSignOutAlt } from "@react-icons/all-files/fa/FaSignOutAlt";
 import axios, {AxiosResponse} from 'axios'
 import { useRouter } from 'next/router';
-import { deleteCookie, getCookie, setCookie } from 'cookies-next';
+import { deleteCookie, getCookie, removeCookies, setCookie } from 'cookies-next';
 import Link from 'next/link';
 import { useMsal } from "@azure/msal-react"
 import {io} from 'socket.io-client'

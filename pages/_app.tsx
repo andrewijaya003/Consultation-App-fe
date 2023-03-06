@@ -9,17 +9,43 @@ import Navbar from '../components/Layout/Navbar'
 import useSWR, { SWRConfig } from 'swr'
 import { MsalProvider, useIsAuthenticated, useMsal } from "@azure/msal-react";
 import { msalInstance } from "../config/msal";
-import { getCookie, setCookie } from 'cookies-next'
+import { deleteCookie, getCookie, setCookie } from 'cookies-next'
 import { NextRequest, NextResponse } from 'next/server'
 
 function MyApp({ Component, pageProps }: AppProps) {
     const router = useRouter()
     const [showChild, setShowChild] = useState(false)
     const token = getCookie('ACCESS_TOKEN')
+	// console.log(param)
+	// console.log(router.query)
+	const clear = getCookie('CLEAR_SESSION_COOKIE')
+
+	// useEffect(() => {
+	// 	if(clear) {
+	// 		window.sessionStorage.clear()
+	// 		document.cookie.split(';').forEach(function(cookie) {
+	// 			document.cookie = cookie.replace(/^ +/, '').replace(/=.*/, '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;');
+	// 		});
+	// 	}
+	// }, [clear])
+
+	useEffect(() => {
+		if(clear === 'CLEAR') {
+			window.sessionStorage.clear()
+			document.cookie.split(';').forEach(function(cookie) {
+				document.cookie = cookie.replace(/^ +/, '').replace(/=.*/, '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;');
+			});
+			deleteCookie('CLEAR_SESSION_COOKIE')
+			// console.log("DUARRRRR CLEAR")
+		}
+		// console.log('ini clear ygy ')
+		// console.log(clear)
+	}, [clear])
 
     useEffect(() => {
         if(token == '' || token == undefined || token == null) {
-            router.push('/')
+			// deleteCookie('CLEAR_SESSION_COOKIE')
+            // router.push('/')
         }
     }, [token])
 

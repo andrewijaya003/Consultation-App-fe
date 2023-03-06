@@ -1,5 +1,5 @@
 import { count } from 'console'
-import { getCookie } from 'cookies-next'
+import { getCookie, getCookies } from 'cookies-next'
 import React, { useEffect, useState } from 'react'
 import { BiChevronDown } from 'react-icons/bi'
 import useSWR from 'swr'
@@ -85,15 +85,12 @@ function rating() {
 
     useEffect(() => {
         if(rating) {
-            let arrAvg:any = []
-            let arrMonth:string[] = []
-            for(let i = 0; i < 12; i++) {
-                if(rating[i]?.averageRating == undefined || rating[i]?.averageRating == null) {
-                    arrAvg.push(0)
-                } else {
-                    arrAvg.push(rating[i].averageRating)
-                }
-            }
+            let arrAvg:any = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+			for(let j = 0; j < rating?.length; j++){
+				arrAvg[rating[j].monthNumber - 1] =  rating[j].averageRating
+			}
+
             setAverageRating({
                 labels: labels,
                 datasets: [
@@ -189,6 +186,8 @@ function rating() {
     useEffect(() => {
         console.log(detailRating)
     }, [detailRating])
+
+	console.log(getCookies())
     
     
     return (

@@ -17,12 +17,14 @@ function loginAD() {
     const [graphData, setGraphData] = useState();
     const router = useRouter()
     const [errorMsg, setErrorMsg] = useState('please wait')
+	const [isDone, setIsDone] = useState(false)
     const particlesInit = useCallback(async (engine: Engine) => {
         await loadFull(engine);
     }, []);
 
     const particlesLoaded = useCallback(async (container: Container | undefined) => {
     }, []);
+
     
     useEffect(() => {
         if(microsoftIsAuthenticated == true){
@@ -46,14 +48,16 @@ function loginAD() {
 						})
 					}).then(
 						res => res.json()
-					).then((data) => {
-						console.log('lne 50')
+					).then(async (data) => {
+						// console.log('ini data ')
+						// console.log(data)
 						if(data.statusCode > 300) {
 							setErrorMsg('check your role')
 						} else {
-							setCookie('ACCESS_TOKEN', data.access_token, {maxAge: 7200})
 							setCookie('REFRESH_TOKEN', data.refresh_token, {maxAge: 86400*7})
+							setCookie('ACCESS_TOKEN', data.access_token, {maxAge: 7200})
 							setCookie('ROLE', window.localStorage.getItem('ROLE') == undefined ? 'STUDENT' : window.localStorage.getItem('ROLE'), {maxAge: 86400*7})
+							setIsDone(true)
 						}
 					}).catch(() => {
 						setErrorMsg('credential')
@@ -62,6 +66,13 @@ function loginAD() {
 			}).catch((err) => console.log(err))
         }
     }, [microsoftIsAuthenticated]);
+
+	useEffect(() => {
+		if(isDone) {
+			setIsDone(false)
+			router.push("/home")
+		}
+	}, [isDone])
     
     return (
         <>
