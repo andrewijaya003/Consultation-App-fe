@@ -92,10 +92,10 @@ function LoginForm() {
 				<div onClick={() => actorHandler('STAFF')} className="w-max h-max text-center text-smalltext text-gray-400 font-bold duration-200 hover:text-blue hover:cursor-pointer">
 					Staff
 				</div>
-				<div onClick={() => actorHandler('FACULTY SUPERVISOR')} className="w-max h-max text-center text-smalltext text-gray-400 font-bold duration-200 hover:text-blue hover:cursor-pointer">
+				<div onClick={() => actorHandler('FS')} className="w-max h-max text-center text-smalltext text-gray-400 font-bold duration-200 hover:text-blue hover:cursor-pointer">
 					Faculty Supervisor
 				</div>
-				<div onClick={() => actorHandler('SITE SUPERVISOR')} className="w-max h-max text-center text-smalltext text-gray-400 font-bold duration-200 hover:text-blue hover:cursor-pointer">
+				<div onClick={() => actorHandler('SS')} className="w-max h-max text-center text-smalltext text-gray-400 font-bold duration-200 hover:text-blue hover:cursor-pointer">
 					Site Supervisor
 				</div>
 			</div>
