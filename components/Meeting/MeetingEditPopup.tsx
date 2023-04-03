@@ -35,7 +35,6 @@ function MeetingEditPopup(props:any) {
     }, [props.edit])
 
     useEffect(() => {
-        console.log(props.meeting)
         if(props.meeting !== undefined) {
             if(props.meeting.user != null) {
                 setEmail(props.meeting.user.email)
@@ -64,7 +63,6 @@ function MeetingEditPopup(props:any) {
         }
 
         if(email !== '' && code !== undefined && date !== '' && time !== '' && description !== '' && notes !== '') {
-            console.log('a')
             const data = await fetch(process.env.BASE_URL + '/meeting', {
                 headers : { 
                     'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN"),

@@ -14,7 +14,6 @@ function SignInMicrosoft() {
 
     const loginMicrosoft = () => {
         instance.loginRedirect(loginRequest).catch(e => {
-            console.log(e)
         })
     }
 

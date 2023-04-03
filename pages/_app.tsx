@@ -16,8 +16,6 @@ function MyApp({ Component, pageProps }: AppProps) {
     const router = useRouter()
     const [showChild, setShowChild] = useState(false)
     const token = getCookie('ACCESS_TOKEN')
-	// console.log(param)
-	// console.log(router.query)
 	const clear = getCookie('CLEAR_SESSION_COOKIE')
 
 	// useEffect(() => {
@@ -36,10 +34,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 				document.cookie = cookie.replace(/^ +/, '').replace(/=.*/, '=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;');
 			});
 			deleteCookie('CLEAR_SESSION_COOKIE')
-			// console.log("DUARRRRR CLEAR")
 		}
-		// console.log('ini clear ygy ')
-		// console.log(clear)
 	}, [clear])
 
     useEffect(() => {

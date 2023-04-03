@@ -70,7 +70,6 @@ function UserNotes(props:any) {
     }, [props.userId])
 
     useEffect(() => {
-        console.log(userNoteData)
     }, [userNoteData])
     
     return (

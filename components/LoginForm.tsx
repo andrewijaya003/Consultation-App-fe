@@ -52,7 +52,6 @@ function LoginForm() {
             }).then(
                 res => res.json()
             ).then((data) => {
-                console.log(data)
                 if(data.ResultCode > 300) {
                     setErrorMsg('Wrong credential')
                     setLoading(false)

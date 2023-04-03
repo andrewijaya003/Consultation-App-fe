@@ -34,7 +34,6 @@ function loginAD() {
 				account: accounts[0],
 			})
 			.then((response) => {
-				console.log('asd')
 				callMsGraph(response.accessToken).then((response) => {
 					setGraphData(response)
 					fetch(process.env.BASE_URL+'/auth/login', {

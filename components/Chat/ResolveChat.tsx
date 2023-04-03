@@ -83,7 +83,6 @@ function ResolveChat(props:any) {
                 })
             }).then((res) => res.json()).then((data) => {
                 props.socket.emit('notify-room-status-change', {message: data})
-                console.log('masuk nih')
                 props.refetch()
                 props.resetUserId()
                 props.onClose()

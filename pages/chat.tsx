@@ -75,15 +75,12 @@ function Chat() {
         if(rooms == undefined) return
 
         socket.on('staff-notification', ((data:any) => {
-            console.log(data)
             if(rooms != undefined) {
-				console.log(rooms)
                 if(data.data.message[0]?.file != null) {
                     rooms.map((room:any) => {
                         if(room.user.id == data.data.message[0].user.id) {
                             room.lastChat = data.data.message[data.data.message.length-1]
                             room.status = 'Pending'
-							console.log(data.data.message)
 							setRoomChatId(data.data.message?.roomId)
                         }
                     })
@@ -92,7 +89,6 @@ function Chat() {
                         if(room.user.id == data.data.message.user.id) {
                             room.lastChat = data.data.message
                             room.status = 'Pending'
-							console.log(data.data.message)
 							setRoomChatId(data.data.message?.roomId)
                         }
                     })
@@ -111,11 +107,8 @@ function Chat() {
         if(rooms == undefined) return
 
         socket.on('room-status-change', ((data:any) => {
-            // console.log(data)
-            // console.log(rooms)
             if(rooms != undefined) {
                 if(data.data.message[0]?.file != null) {
-                    // console.log('masuk ke file nih')
                     rooms.map((room:any) => {
                         if(room.lastChat.roomId == data.data.message[0].id) {
                             room.lastChat.status = data.data.message[data.data.message.length-1].status
@@ -125,7 +118,6 @@ function Chat() {
                 } else {
                     rooms.map((room:any) => {
                         if(room.lastChat.roomId == data.data.message.id) {
-                            // console.log('masuk ke tidak file nih')
                             room.lastChat.status = data.data.message.status
                             room.status = data.data.message.status
                         }
@@ -141,7 +133,6 @@ function Chat() {
     }, [rooms])
 
     function changeHeader(message:any) {
-        // console.log('ini change')
         if(rooms != undefined) {
             if(message[0]?.file != null) {
                 rooms.map((room:any) => {
@@ -161,11 +152,9 @@ function Chat() {
     }
 
     function readHeader(roomId:string) {
-        console.log('ini header')
         if(rooms != undefined) {
             rooms.map((room:any) => {
                 if(room.lastChat.roomId == roomId && room.lastChat.staff == null) {
-                    // console.log(room.lastChat)
                     room.lastChat.readTime = new Date()
                 }
             })
@@ -241,7 +230,6 @@ function Chat() {
                     setNewRooms(data)
                 })
             } else {
-                // console.log('ini username 1')
                 fetch(process.env.BASE_URL+'/room-chat/preview', {
                     headers: {
                         'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
@@ -341,7 +329,6 @@ function Chat() {
 
     const refetchRoomsFilter = async (role:string, categoryId:string, username:string) => {
         if(role != '') {
-            // console.log('ini role')
             await fetch(process.env.BASE_URL+'/room-chat/preview', {
                 headers: {
                     'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
@@ -359,7 +346,6 @@ function Chat() {
                 setTakeRooms(20)
             })
         } else if(categoryId != '') {
-            // console.log('ini category')
             await fetch(process.env.BASE_URL+'/room-chat/preview', {
                 headers: {
                     'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
@@ -377,7 +363,6 @@ function Chat() {
                 setTakeRooms(20)
             })
         } else if(username != '') {
-            // console.log('ini username')
             await fetch(process.env.BASE_URL+'/room-chat/preview', {
                 headers: {
                     'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
@@ -390,7 +375,6 @@ function Chat() {
                     take: 10
                 })
             }).then(res => res.json()).then(data => {
-                // console.log(data)
                 setRooms(data)
                 setOffsetRooms(10)
                 setTakeRooms(20)
@@ -413,7 +397,6 @@ function Chat() {
         socket.emit('staff-join-user-room', {userId: header.user?.id})
         socket.emit('read-all-message', header.lastChat.roomId)
         readHeader(header.lastChat.roomId)
-        // console.log('hallo')
     }
     
     function handleJoinRoomChatFilter(header:Object) {
@@ -424,7 +407,6 @@ function Chat() {
     }
 
     useEffect(() => {
-        console.log(categories)
     }, [categories])
 
     return (

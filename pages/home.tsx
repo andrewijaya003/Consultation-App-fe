@@ -23,18 +23,6 @@ function Home() {
     const {data:announcementAll, mutate:announcementAllMutate} = useSWR(endpointAnnouncementAll, fetcherAll, {revalidateOnFocus: false})
     const [bounceSearch] = useDebounce(search, 1000)
 
-    // useEffect(() => {
-        // fetch('http://localhost:3000/api/refreshToken')
-        // .then((res) => res.json())
-        // .then((res) => {
-        //     console.log(res)
-        //     if(res.access_token != null) {
-        //         setCookie('ACCESS_TOKEN', res.access_token)
-        //     }
-        // })
-        // .catch((err) => console.log(err))
-    // }, [])
-
     const refetch = async () => {
         await announcementAllMutate()
         setAdd(false)

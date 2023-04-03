@@ -238,7 +238,6 @@ function UserChat(props:any) {
                 take: 15
             })
         }).then(res => res.json()).then((data) => {
-            console.log(data)
             setChats(data)
             setOffsetChats(15)
             setTakeChats(30)
@@ -269,7 +268,6 @@ function UserChat(props:any) {
     }
 
     function appendNewChat(data:any) {
-        console.log(data)
         if(chats != undefined) {
             if(data[0]?.file != null) {
                 data.map((message:any) => {
@@ -396,7 +394,6 @@ function UserChat(props:any) {
                 setIsDisplay(true)
             }
         }
-        console.log(activeRoom)
     }, [activeRoom])
 
     // useEffect(() => {

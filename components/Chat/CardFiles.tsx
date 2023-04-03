@@ -7,7 +7,6 @@ function CardFiles(props:any) {
     const [errorMsg, setErrorMsg] = useState('')
 
     useEffect(() => {
-        console.log(props.src)
     }, [props.src])
 
     useEffect(() => {

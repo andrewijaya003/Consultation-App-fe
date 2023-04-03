@@ -19,13 +19,6 @@ export async function middleware(request:NextRequest) {
     }).then(data => data.json())
 	token = data.access_token
 
-	// console.log('ini acc token ')
-	// console.log(token)
-	// console.log('ini path name ')
-	// console.log(pathname)
-	// console.log('ini ref token ')
-	// console.log(refreshToken)
-
     if(data.access_token != undefined){
 		const response = NextResponse.next()
         response.cookies.set('ACCESS_TOKEN', data.access_token)
@@ -51,7 +44,6 @@ export async function middleware(request:NextRequest) {
 	} 
 	else if(token == undefined && refreshToken != undefined) {
 		// request.nextUrl.pathname = request.nextUrl.pathname + '?clear=true'
-		console.log('middleware duar')
 		const response = NextResponse.next()
 		response.cookies.set('CLEAR_SESSION_COOKIE', 'CLEAR')
 		return response

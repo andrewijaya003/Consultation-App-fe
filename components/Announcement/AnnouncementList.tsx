@@ -40,7 +40,6 @@ function AnnouncementList(props:any) {
     }, [edit, del])
 
     useEffect(() => {
-        console.log(props.announcements)
         setAnnouncemets(props.announcements)
     }, [props.announcements])
 

@@ -39,7 +39,6 @@ function Navbar() {
                         "Authorization": "Bearer "+getCookie("ACCESS_TOKEN")
                     }
                 })
-                .catch((err) => console.log(err.response))
     
                 deleteCookie("ACCESS_TOKEN")
                 deleteCookie("REFRESH_TOKEN")

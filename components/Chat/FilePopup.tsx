@@ -19,21 +19,17 @@ function FilePopup(props:any) {
             arr.append('files', props.fixFiles[i])
         }
         setSendFiles(arr)
-        console.log(arr)
     }, [props.fixFiles, props.roomChatId])
 
     useEffect(() => {
         if(sendFiles != undefined) {
-            // console.log('fi')
             for (const value of sendFiles.values()) {
-                console.log(value);
             }
         }
     }, [sendFiles])
 
     async function sendFilesHandler() {
         if(sendFiles != undefined) {
-            console.log(sendFiles)
             await fetch(process.env.BASE_URL + '/chat/multiple', {
                 headers : { 
                     'Authorization': 'Bearer '+getCookie("ACCESS_TOKEN"),
@@ -41,7 +37,6 @@ function FilePopup(props:any) {
                 method: 'POST',
                 body: sendFiles
             }).then((res) => res.json()).then((data) => {
-                console.log(data)
                 props.socket.emit('message', {message: data})
                 props.appendNewChat(data)
 

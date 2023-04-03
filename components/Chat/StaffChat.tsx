@@ -70,15 +70,12 @@ function UserChat(props:any) {
                 },
                 method: 'PUT',
             }).then(res => res.json())
-            // .then((data) => console.log(data))
 
             if(rooms != undefined) {
                 rooms?.map((room:any) => {
                     if(room.id == data.data) {
-                        // console.log(room.id+' '+data.data)
                         room.chats.map((chat:any) => {
                             if(chat.staff != null) {
-                                // console.log('ini chat staff')
                                 chat.readTime = new Date()
                             }
                         })
@@ -128,9 +125,7 @@ function UserChat(props:any) {
         if (rooms == undefined) return
 
         props.socket.on('receive-message', ((data:any) => {
-            console.log(data)
             if(rooms != undefined){
-				console.log(rooms)
                 if(data.data.message[0]?.file != null) {
                     if(rooms[0].chats[0] != undefined) {
                         data.data.message.map((message:any) => {
@@ -156,7 +151,6 @@ function UserChat(props:any) {
 
     useEffect(() => {
         props.socket.on('client-start-typing', () => {
-            console.log('ketik')
             setIstyping(true)
         })
 
@@ -167,7 +161,6 @@ function UserChat(props:any) {
 
     useEffect(() => {
         props.socket.on('client-stop-typing', () => {
-            console.log('tidak ketik')
             setIstyping(false)
         })
 
@@ -242,14 +235,11 @@ function UserChat(props:any) {
     
 
     useEffect(() => {
-        // console.log(props.focusIdComponent)
         document.getElementById(props.focusIdComponent)?.scrollIntoView()
     }, [props.focusIdComponent])
 
     useEffect(() => {
         if(files.length != 0 ) {
-            console.log('ini files')
-            console.log(files)
             let list = []
             for(let i = 0; i < files.length; i++) {
                 // list.push(URL.createObjectURL(files[i]))
@@ -272,7 +262,6 @@ function UserChat(props:any) {
     }
 
     function appendNewChat(data:any) {
-        console.log('ini append')
         if(rooms != undefined){
             if(data[0]?.file != null) {
                 if(rooms[0].chats[0] != undefined) {
@@ -323,7 +312,6 @@ function UserChat(props:any) {
     }, [props.userId, props.roomChatId])
     
     useEffect(() => {
-        // console.log(rooms)
         if(rooms) {
             document.getElementById(props.focusIdComponent)?.scrollIntoView()
         }
@@ -381,7 +369,6 @@ function UserChat(props:any) {
     }
 
 	useEffect(() => {
-		console.log(rooms)
 	}, [rooms])
     
     return (

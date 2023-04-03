@@ -17,5 +17,4 @@ export async function callMsGraph(accessToken: string) {
 
     return fetch(graphConfig.graphMeEndpoint, options)
         .then(response => response.json())
-        .catch(error => console.log(error));
 }

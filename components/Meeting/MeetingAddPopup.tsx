@@ -64,7 +64,6 @@ function MeetingAddPopup(props:any) {
                 })
             }).then(res => res.json())
             
-            console.log(data)
             if(data?.statusCode > 399) {
                 setErrorMsg(data.message)
             } else {

@@ -34,7 +34,6 @@ function FAQList(props:any) {
     //         },
     //         method: 'GET',
     //     }).then(res => res.json()).then(d => {
-    //         console.log(d)
     //         setData(d)
     //     })
     // }
@@ -71,7 +70,6 @@ function FAQList(props:any) {
     }
 
     useEffect(() => {
-        console.log(data)
     }, [data])
     
     return (

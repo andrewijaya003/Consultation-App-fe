@@ -54,7 +54,6 @@ function meeting() {
     }, [user])
     
     useEffect(() => {
-        console.log(meetings)
     }, [meetings])
 
     const compareDates = (d1:any, d2:any) => {

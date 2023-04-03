@@ -1,4 +1,3 @@
-import { count } from 'console'
 import { getCookie, getCookies } from 'cookies-next'
 import React, { useEffect, useState } from 'react'
 import { BiChevronDown } from 'react-icons/bi'
@@ -80,7 +79,6 @@ function rating() {
     const [showDP, setShowDP] = useState(false)
 
     useEffect(() => {
-        console.log(countStatus)
     }, [countStatus])
 
     useEffect(() => {
@@ -165,11 +163,9 @@ function rating() {
     }, [searchMonth])
 
     useEffect(() => {
-        console.log(month)
     }, [month])
 
     useEffect(() => {
-        console.log(year)
     }, [year])
 
     useEffect(() => {
@@ -184,10 +180,8 @@ function rating() {
     }, [bounceMonth])
 
     useEffect(() => {
-        console.log(detailRating)
     }, [detailRating])
 
-	console.log(getCookies())
     
     
     return (

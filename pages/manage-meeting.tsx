@@ -159,10 +159,6 @@ function ManageMeeting() {
         }
     }, [])
 
-    useEffect(() => {
-        console.log(data)
-    }, [data])
-
     return (
         <div className='max-w-screen-xl w-full px-4 py-5 flex flex-col ml-auto mr-auto'>
             {/* PageTitle Start */}

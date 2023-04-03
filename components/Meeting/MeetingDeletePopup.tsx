@@ -8,7 +8,6 @@ function MeetingDeletePopup(props:any) {
     const moment = require('moment')
 
     useEffect(() => {
-        console.log(props.meeting)
         if(props.meeting != undefined) {
             setId(props.meeting.id)
         }

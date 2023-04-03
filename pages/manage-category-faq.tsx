@@ -54,20 +54,6 @@ function ManageCategory(props:any) {
         setSearch(value)
     }
 
-    // useEffect(() => {
-    //     if(bounceSearch != '') {
-    //         console.log(bounceSearch)
-    //         fetch(process.env.BASE_URL+'/category/search/'+bounceSearch, {
-    //             headers: {
-    //                 'Authorization': 'Bearer '+getCookie('ACCESS_TOKEN'),
-    //             },
-    //             method: 'GET'
-    //         }).then(res => res.json()).then((d) => mutate([...d]))
-    //     } else {
-    //         mutate(process.env.BASE_URL+'/category')
-    //     }
-    // }, [bounceSearch])
-
     return (
         <>
             <div className='max-w-screen-xl w-full px-4 py-5 flex flex-col ml-auto mr-auto'>

@@ -4,10 +4,6 @@ import { RESERVED_EVENTS } from "socket.io/dist/socket";
 export default async function handleRefreshToken(req:NextRequest, res) {
     let token = req.cookies.ACCESS_TOKEN
     let refreshToken = req.cookies.REFRESH_TOKEN
-    
-    // console.log(req.headers)
-    // console.log(req.cookies.ACCESS_TOKEN)
-    // console.log(res)
 
     const data = await fetch(process.env.BASE_URL + '/auth/refresh-token', {
         headers: {

@@ -26,7 +26,6 @@ function UserMessage(props:any) {
     }
 
     async function downloadUsingFetch(url:string, filename:string) {
-		// console.log(url+' '+filename)
         await fetch(process.env.BASE_URL+'/'+url)
 		.then((res) => 
 			res.blob()

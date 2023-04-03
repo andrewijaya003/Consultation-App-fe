@@ -94,19 +94,17 @@ function contact() {
                 setChatUs(true)
                 setRoomChatData(data)
                 setErrorMsg('')
-            }).catch(e => console.log(e))
+            })
         } else {
             setErrorMsg('Category must be selected')
         }
     }
 
     useEffect(() => {
-        console.log(roomChat)
         setRoomChatData(roomChat)
     }, [roomChat])
 
     useEffect(() => {
-        console.log(roomChatData)
         setRoomChatData(roomChatData)
     }, [roomChatData])
 
