@@ -48,8 +48,7 @@ function loginAD() {
 					}).then(
 						res => res.json()
 					).then(async (data) => {
-						// console.log('ini data ')
-						// console.log(data)
+						console.log(data)
 						if(data.statusCode > 300) {
 							setErrorMsg('check your role')
 						} else {
